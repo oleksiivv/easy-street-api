@@ -5,11 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Game extends Model
 {
     use HasFactory;
+
+    public const GAME_SORT_DIRECTION_ASC = 'ASC';
+
+    public const GAME_SORT_DIRECTION_DESC = 'DESC';
 
     public const GENRES = ['arcade', 'hyper-casual', 'strategy', 'quiz', 'racing', 'victory', 'adventure'];
 
@@ -58,5 +63,10 @@ class Game extends Model
     public function publisher(): BelongsTo
     {
         return $this->belongsTo(User::class, 'company_id');
+    }
+
+    public function customerGames(): HasMany
+    {
+        return $this->hasMany(CustomerGame::class);
     }
 }

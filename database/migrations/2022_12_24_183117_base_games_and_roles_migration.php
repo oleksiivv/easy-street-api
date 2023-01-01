@@ -43,6 +43,7 @@ return new class extends Migration
             $table->string('site');
             $table->string('phone_number');
             $table->unsignedBigInteger('publisher_id');
+            $table->json('team_members');
 
             $table->foreign('publisher_id')
                 ->references('id')
@@ -57,6 +58,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
 
+            $table->unsignedBigInteger('company_id');
+
+            $table->foreign('company_id')
+                ->references('id')
+                ->on('companies');
+
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });
@@ -70,6 +77,11 @@ return new class extends Migration
             $table->string('site')->nullable();
 
             $table->unsignedBigInteger('game_category_id')->nullable();
+            $table->unsignedBigInteger('company_id');
+
+            $table->foreign('company_id')
+                ->references('id')
+                ->on('companies');
 
             $table->foreign('game_category_id')
                 ->references('id')

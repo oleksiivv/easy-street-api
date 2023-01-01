@@ -16,7 +16,7 @@ class RoleSeeder extends Seeder
      */
     public function run()
     {
-        $publisherTeamMemberRole = Role::factory()
+        Role::factory()
             ->create([
                 'name' => Role::ROLE_PUBLISHER_TEAM_MEMBER,
                 'permissions' => ['game' => ['crud']],
@@ -26,18 +26,6 @@ class RoleSeeder extends Seeder
             ->create([
                 'name' => Role::ROLE_CUSTOMER,
                 'permissions' => ['game' => ['read']],
-            ]);
-
-        Role::factory()
-            ->create([
-                'name' => Role::ROLE_PUBLISHER,
-                'permissions' => [
-                    'game' => ['crud!'],
-                    'team_members' => [
-                        User::factory()->create(['role_id' => $publisherTeamMemberRole->id])->id,
-                        User::factory()->create(['role_id' => $publisherTeamMemberRole->id])->id,
-                    ],
-                ],
             ]);
 
         Role::factory()

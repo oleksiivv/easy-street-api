@@ -18,6 +18,11 @@ class GameCategory extends Model
         'description',
     ];
 
+    public function publisher(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'company_id');
+    }
+
     public function games(): HasMany
     {
         return $this->hasMany(Game::class);

@@ -8,15 +8,12 @@ use Illuminate\Support\Collection;
 
 class GameRepository
 {
-    public const GAME_SORT_DIRECTION_ASC = 'ASC';
-    public const GAME_SORT_DIRECTION_DESC = 'DESC';
-
     public function get(int $id): Game
     {
         return Game::findOrFail($id);
     }
 
-    public function list(array $filter = [], string $sort = 'id', string $direction = self::GAME_SORT_DIRECTION_ASC): Collection
+    public function list(array $filter = [], string $sort = 'id', string $direction = Game::GAME_SORT_DIRECTION_ASC): Collection
     {
         $games = Game::where($filter)->orderBy($sort, $direction)->get();
 

@@ -10,6 +10,10 @@ class Company extends Model
 {
     use HasFactory;
 
+    public const COMPANY_SORT_DIRECTION_ASC = 'ASC';
+
+    public const COMPANY_SORT_DIRECTION_DESC = 'DESC';
+
     protected $table = 'companies';
 
     protected $fillable = [
