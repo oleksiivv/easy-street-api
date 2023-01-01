@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\GameDTO;
 use App\Http\Requests\CreateGameRequest;
+use App\Http\Requests\GetGamesRequest;
 use App\Http\Requests\UpdateGameCategoryRequest;
 use App\Http\Requests\UpdateGamePageRequest;
 use App\Http\Requests\UpdateGameReleaseRequest;
 use App\Http\Requests\UpdateGameRequest;
 use App\Http\Requests\UpdateGameSecurityRequest;
+use App\Repositories\GameRepository;
 use App\UseCases\CreateGameUseCase;
 use App\UseCases\UpdateGameUseCase;
 use Illuminate\Http\Response;
@@ -18,7 +19,22 @@ class PublisherGameController extends Controller
     public function __construct(
         private CreateGameUseCase $createGameUseCase,
         private UpdateGameUseCase $updateGameUseCase,
+        private GameRepository $gameRepository,
     ) {
+    }
+
+    public function index(GetGamesRequest $getGamesRequest): Response
+    {
+        $data = $this->gameRepository->list();
+
+        return new Response($data);
+    }
+
+    public function getGame(int $id): Response
+    {
+        $game = $this->gameRepository->get($id);
+
+        return new Response($game);
     }
 
     public function createGame(CreateGameRequest $createGameRequest): Response

@@ -4,9 +4,29 @@ namespace App\Repositories;
 
 use App\DTO\GameDTO;
 use App\Models\Game;
+use Illuminate\Support\Collection;
 
 class GameRepository
 {
+    public const GAME_SORT_DIRECTION_ASC = 'ASC';
+    public const GAME_SORT_DIRECTION_DESC = 'DESC';
+
+    public function get(int $id): Game
+    {
+        return Game::findOrFail($id);
+    }
+
+    public function list(array $filter = [], string $sort = 'id', string $direction = self::GAME_SORT_DIRECTION_ASC): Collection
+    {
+        $games = Game::where($filter)->orderBy($sort, $direction)->get();
+
+        $result = collect([]);
+        $result['data'] = $games;
+        $result['pagination'] = [];
+
+        return $result;
+    }
+
     public function create(GameDTO $data): Game
     {
         return Game::create(array_filter($data->toArray()));
