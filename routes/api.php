@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PublisherGameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['prefix' => '/publisher'], function () {
+    Route::group(['prefix' => '/game'], function () {
+        Route::post('/', [PublisherGameController::class, 'createGame']);
+        Route::put('/', [PublisherGameController::class, 'updateGame']);
+
+        Route::group(['prefix' => '/update'], function () {
+            Route::put('/release', [PublisherGameController::class, 'updateGameRelease']);
+            Route::put('/security', [PublisherGameController::class, 'updateGameSecurity']);
+            Route::put('/page', [PublisherGameController::class, 'updateGamePage']);
+            Route::put('/category', [PublisherGameController::class, 'updateGameCategory']);
+        });
+    });
 });
