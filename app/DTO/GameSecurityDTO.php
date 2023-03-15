@@ -6,15 +6,15 @@ use Spatie\DataTransferObject\DataTransferObject;
 
 class GameSecurityDTO extends DataTransferObject
 {
-    private ?bool $has_ads;
+    public ?bool $has_ads;
 
-    private ?array $ads_providers;
+    public ?array $ads_providers;
 
-    private ?string $privacy_policy_url;
+    public ?string $privacy_policy_url;
 
-    private ?int $minimum_age;
+    public ?int $minimum_age;
 
-    private ?array $sensitive_content;
+    public ?array $sensitive_content;
 
     public ?int $game_id;
 }

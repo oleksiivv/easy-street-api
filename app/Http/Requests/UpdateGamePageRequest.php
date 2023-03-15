@@ -23,7 +23,7 @@ class UpdateGamePageRequest extends FormRequest
     {
         $data = $this->validated();
 
-        $gamePage = new GamePageDTO([$data]);
+        $gamePage = new GamePageDTO($data);
 
         return new GameDTO([
             'game_page_data' => $gamePage,

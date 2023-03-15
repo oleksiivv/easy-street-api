@@ -16,10 +16,10 @@ class UpdateGameRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
-            'genre' => 'required|in:' . join(',', Game::GENRES),
-            'status' => 'required|in: draft, in_review',
-            'tags' => 'required|array',
+            'name' => 'nullable|string',
+            'genre' => 'nullable|in:' . join(',', Game::GENRES),
+            'status' => 'required|string|in:' . join(',', Game::STATUSES_AVAILABLE_FOR_PUBLISHER),
+            'tags' => 'nullable|array',
             'site' => 'nullable|string',
             'game_category_id' => 'nullable|int',
 
@@ -60,10 +60,10 @@ class UpdateGameRequest extends FormRequest
     {
         $data = $this->validated();
 
-        $paidProduct = new PaidProductDTO([$data['paid_product']]);
-        $gamePage = new GamePageDTO([$data['game_page']]);
-        $gameRelease = new GameReleaseDTO([$data['game_release']]);
-        $gameSecurity = new GameSecurityDTO([$data['game_security']]);
+        $paidProduct = data_get($data, 'paid_product') ? new PaidProductDTO(data_get($data, 'paid_product')) : null;
+        $gamePage = data_get($data, 'game_page') ? new GamePageDTO(data_get($data, 'game_page')) : null;
+        $gameRelease = data_get($data, 'game_release') ? new GameReleaseDTO(data_get($data, 'game_release')) : null;
+        $gameSecurity = data_get($data, 'game_security') ? new GameSecurityDTO(data_get($data, 'game_security')) : null;
 
         $game = new GameDTO([
             'name' => data_get($data, 'name'),

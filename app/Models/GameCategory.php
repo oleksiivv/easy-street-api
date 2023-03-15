@@ -16,6 +16,7 @@ class GameCategory extends Model
     protected $fillable = [
         'name',
         'description',
+        'company_id',
     ];
 
     public function publisher(): BelongsTo

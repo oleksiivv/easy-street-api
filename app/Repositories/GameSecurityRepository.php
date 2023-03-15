@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\DTO\GameSecurityDTO;
 use App\Models\GameSecurity;
+use Throwable;
 
 class GameSecurityRepository
 {
@@ -16,6 +17,15 @@ class GameSecurityRepository
 
     public function update(?int $id, GameSecurityDTO $data): GameSecurity
     {
-        return GameSecurity::findOrUpdate($id, array_filter($data->toArray()));
+        try {
+            $gameSecurity = GameSecurity::find($id);
+            $gameSecurity->update(array_filter($data->toArray()));
+
+            $gameSecurity->save();
+        } catch (Throwable) {
+            $gameSecurity = GameSecurity::create(array_filter($data->toArray()));
+        }
+
+        return $gameSecurity->refresh();
     }
 }

@@ -24,6 +24,12 @@ class RoleSeeder extends Seeder
 
         Role::factory()
             ->create([
+                'name' => Role::ROLE_PUBLISHER,
+                'permissions' => ['game' => ['crud'], 'company' => ['crud']],
+            ]);
+
+        Role::factory()
+            ->create([
                 'name' => Role::ROLE_CUSTOMER,
                 'permissions' => ['game' => ['read']],
             ]);

@@ -9,4 +9,6 @@ class GameCategoryDTO extends DataTransferObject
     public ?string $name;
 
     public ?string $description;
+
+    public ?int $company_id;
 }

@@ -24,8 +24,14 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
+
             $table->string('email');
+            $table->string('email_confirmation_token')->nullable();
+            $table->boolean('email_is_confirmed')->default(false);
+
             $table->string('password_sha');
+            $table->string('update_password_token')->nullable();
+
             $table->unsignedBigInteger('role_id');
 
             $table->foreign('role_id')

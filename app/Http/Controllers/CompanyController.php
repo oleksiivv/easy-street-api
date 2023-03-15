@@ -7,8 +7,14 @@ use App\Http\Requests\CreateCompanyRequest;
 use App\Http\Requests\GetCompaniesRequest;
 use App\Http\Requests\RemovePublisherTeamMemberRequest;
 use App\Http\Requests\UpdateCompanyRequest;
+use App\Models\Company;
 use App\Repositories\CompanyRepository;
+use App\Repositories\DownloadsRepository;
+use App\Repositories\LikesRepository;
+use App\Repositories\UserSubscriptionsRepository;
+use App\Services\PaymentService;
 use App\UseCases\AddPublisherTeamMemberUseCase;
+use App\UseCases\CreateCompanyUseCase;
 use App\UseCases\RemovePublisherTeamMemberUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,6 +25,10 @@ class CompanyController extends Controller
         private CompanyRepository $companyRepository,
         private AddPublisherTeamMemberUseCase $addPublisherTeamMemberUseCase,
         private RemovePublisherTeamMemberUseCase $removePublisherTeamMemberUseCase,
+        private CreateCompanyUseCase $createCompanyUseCase,
+        private DownloadsRepository $downloadsRepository,
+        private LikesRepository $likesRepository,
+        private UserSubscriptionsRepository $userSubscriptionsRepository,
     ) {
     }
 
@@ -27,6 +37,31 @@ class CompanyController extends Controller
         $companies = $this->companyRepository->list();
 
         return new Response($companies);
+    }
+
+    public function stats(int $companyId): Response
+    {
+        $company = $this->companyRepository->get($companyId);
+
+        return new Response([
+            'downloads' => $this->downloadsRepository->getCountForCompany($company->id),
+            'likes' => $this->likesRepository->getMiddleForCompany($company->id),
+            'likes_total' => $this->likesRepository->getCountForCompany($company->id),
+            'subscriptions' => $this->userSubscriptionsRepository->getCount($company->id),
+            'subscribers' => $this->userSubscriptionsRepository->list([
+                'publisher_id' => $company->id,
+            ]),
+            'company' => $company->toArray(),
+        ]);
+    }
+
+    public function subscribers(int $companyId)
+    {
+        return new Response([
+            'subscribers' => $this->userSubscriptionsRepository->list([
+                'publisher_id' => $companyId,
+            ])
+        ]);
     }
 
     public function get(int $id, Request $request): Response
@@ -38,7 +73,7 @@ class CompanyController extends Controller
 
     public function create(CreateCompanyRequest $createCompanyRequest): Response
     {
-        $company = $this->companyRepository->create($createCompanyRequest->all());
+        $company = $this->createCompanyUseCase->handle($createCompanyRequest->company, $createCompanyRequest->card);
 
         return new Response($company);
     }

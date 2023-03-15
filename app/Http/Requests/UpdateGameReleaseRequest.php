@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use App\DTO\GameDTO;
 use App\DTO\GameReleaseDTO;
+use App\Repositories\GameRepository;
+use App\Repositories\System\FileRepository;
+use App\System\OperatingSystem;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateGameReleaseRequest extends FormRequest
@@ -12,11 +15,6 @@ class UpdateGameReleaseRequest extends FormRequest
     {
         return [
             'version' => 'required|string',
-            'android_file_url' => 'required|string',
-            'ios_file_url' => 'required|string',
-            'windows_file_url' => 'required|string',
-            'mac_file_url' => 'required|string',
-            'linux_file_url' => 'required|string',
             'release_date' => 'required|string',
         ];
     }
@@ -25,7 +23,7 @@ class UpdateGameReleaseRequest extends FormRequest
     {
         $data = $this->validated();
 
-        $gameRelease = new GameReleaseDTO([$data]);
+        $gameRelease = new GameReleaseDTO($data);
 
         return new GameDTO([
             'game_release_data' => $gameRelease,

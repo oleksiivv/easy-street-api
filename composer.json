@@ -7,11 +7,15 @@
     "require": {
         "php": "^8.0.2",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^9.19",
+        "laravel/cashier": "^14.6",
+        "laravel/framework": "^9.52",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "pusher/pusher-php-server": "^7.2",
-        "spatie/data-transfer-object": "^3.9"
+        "spatie/data-transfer-object": "^3.9",
+        "symfony/http-client": "^6.2",
+        "symfony/mailgun-mailer": "^6.2",
+        "league/flysystem-aws-s3-v3": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -62,6 +66,6 @@
             "pestphp/pest-plugin": true
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

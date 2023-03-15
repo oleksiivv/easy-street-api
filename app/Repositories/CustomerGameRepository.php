@@ -38,6 +38,11 @@ class CustomerGameRepository
         return $game->refresh();
     }
 
+    public function exists(array $data): int
+    {
+        return CustomerGame::where($data)->exists();
+    }
+
     public function updateOrCreate(array $search, array $data): void
     {
         CustomerGame::updateOrCreate($search, $data);

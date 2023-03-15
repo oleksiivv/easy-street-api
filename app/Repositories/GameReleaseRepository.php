@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 use App\DTO\GameReleaseDTO;
+use App\Models\Game;
 use App\Models\GameRelease;
+use Throwable;
 
 class GameReleaseRepository
 {
@@ -16,6 +18,42 @@ class GameReleaseRepository
 
     public function update(?int $id, GameReleaseDTO $data): GameRelease
     {
-        return GameRelease::findOrUpdate($id, array_filter($data->toArray()));
+        try {
+            $gameRelease = GameRelease::find($id);
+            $gameRelease->update(array_filter($data->toArray()));
+
+            $gameRelease->save();
+        } catch (Throwable) {
+            $gameRelease = GameRelease::create($data->toArray());
+        }
+
+        return $gameRelease;
+    }
+
+    public function getAvailableVersions(int $gameId): array
+    {
+        $release = Game::findOrFail($gameId)->gameReleases->last();
+
+        return array_filter([
+            'android_file_url' => $release->android_file_url,
+            'ios_file_url' => $release->ios_file_url,
+            'windows_file_url' => $release->windows_file_url,
+            'mac_file_url' => $release->mac_file_url,
+            'linux_file_url' => $release->linux_file_url,
+        ]);
+    }
+
+    public function updateByArray(?int $id, array $data): GameRelease
+    {
+        try {
+            $gameRelease = GameRelease::find($id);
+            $gameRelease->update(array_filter($data));
+
+            $gameRelease->save();
+        } catch (Throwable) {
+            $gameRelease = GameRelease::create($data);
+        }
+
+        return $gameRelease;
     }
 }

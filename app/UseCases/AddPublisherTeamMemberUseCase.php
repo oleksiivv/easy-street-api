@@ -6,28 +6,54 @@ use App\Events\GameDownloadedEvent;
 use App\Events\GameRemovedEvent;
 use App\Models\Company;
 use App\Models\Game;
+use App\Models\Role;
 use App\Repositories\CompanyRepository;
 use App\Repositories\CustomerGameRepository;
 use App\Repositories\GameRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
+use App\Services\MailService;
+use HttpException;
+use Throwable;
+use Webmozart\Assert\Assert;
 
 class AddPublisherTeamMemberUseCase
 {
     public function __construct(
         private CompanyRepository $companyRepository,
         private UserRepository $userRepository,
+        private MailService $mailService,
+        private RoleRepository $roleRepository,
     ) {
     }
 
     public function handle(int $companyId, array $memberSearchCriteria): Company
     {
-        $user = $this->userRepository->findBy($memberSearchCriteria);
+        try {
+            $user = $this->userRepository->findBy($memberSearchCriteria);
 
-        $teamMembersIds = $this->companyRepository->get($companyId)->team_members;
-        $teamMembersIds[] = $user->id;
+            Assert::eq($this->roleRepository->get($user->role_id)->name, Role::ROLE_CUSTOMER);
 
-        return $this->companyRepository->update($companyId, [
-            'team_members' => array_unique($teamMembersIds),
-        ]);
+            $company = $this->companyRepository->get($companyId);
+
+            $teamMembersIds = $company->team_members;
+            $teamMembersIds[] = $user->id;
+
+            $this->mailService->sendNewTeamMemberInvitation($user->email, [
+                'name' => $user->name,
+                'companyName' => $company->name,
+            ], 'Invitation to the team');
+
+            $user->role_id = $this->roleRepository->findByName(Role::ROLE_PUBLISHER_TEAM_MEMBER)->id;
+            $user->save();
+
+            return $this->companyRepository->update($companyId, [
+                'team_members' => collect(array_unique($teamMembersIds))->map(function ($id) {
+                    return $this->userRepository->get($id);
+                })->toArray(),
+            ]);
+        } catch (Throwable $exception) {
+            throw new HttpException("Wrong input data. Couldn't add team member.", 422);
+        }
     }
 }

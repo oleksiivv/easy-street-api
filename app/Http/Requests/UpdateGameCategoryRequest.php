@@ -28,6 +28,7 @@ class UpdateGameCategoryRequest extends FormRequest
         ]);
 
         if (isset($data['game_category'])) {
+            $game->game_category_id = null;
             $game->game_category_data = new GameCategoryDTO($data['game_category']);
         }
 

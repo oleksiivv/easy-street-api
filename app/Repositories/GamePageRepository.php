@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\DTO\GamePageDTO;
 use App\Models\GamePage;
+use Throwable;
 
 class GamePageRepository
 {
@@ -16,6 +17,27 @@ class GamePageRepository
 
     public function update(?int $id, GamePageDTO $data): GamePage
     {
-        return GamePage::findOrUpdate($id, array_filter($data->toArray()));
+        try {
+            $gamePage = GamePage::find($id);
+            $gamePage->update(array_filter($data->toArray()));
+
+            $gamePage->save();
+        } catch (Throwable) {
+            $gamePage = GamePage::create($data->toArray());
+        }
+        return $gamePage;
+    }
+
+    public function updateByArray(?int $id, array $data): GamePage
+    {
+        try {
+            $gamePage = GamePage::find($id);
+            $gamePage->update(array_filter($data));
+
+            $gamePage->save();
+        } catch (Throwable) {
+            $gamePage = GamePage::create($data);
+        }
+        return $gamePage;
     }
 }

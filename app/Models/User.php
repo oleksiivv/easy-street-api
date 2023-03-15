@@ -16,13 +16,18 @@ class User extends Model
 
     public const USER_SORT_DIRECTION_DESC = 'DESC';
 
+    public const PUBLIC_FIELDS = ['first_name', 'last_name'];
+
     protected $table = 'users';
 
     protected $fillable = [
         'first_name',
         'last_name',
         'email',
+        'email_is_confirmed',
+        'email_confirmation_token',
         'password_sha',
+        'update_password_token',
         'role_id',
     ];
 
@@ -36,8 +41,33 @@ class User extends Model
         return $this->belongsTo(Role::class);
     }
 
+    public function userPaymentCard(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
     public function customerGames(): HasMany
     {
         return $this->hasMany(CustomerGame::class);
+    }
+
+    public function companies(): HasMany
+    {
+        return $this->hasMany(Company::class, 'publisher_id');
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function downloads(): HasMany
+    {
+        return $this->hasMany(Download::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
     }
 }

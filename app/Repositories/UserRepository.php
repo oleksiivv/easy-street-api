@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
@@ -9,7 +10,7 @@ class UserRepository
 {
     public function get(int $id): User
     {
-        return User::findOrFail($id);
+        return User::findOrFail($id)->load('role', 'likes', 'subscriptions', 'companies');
     }
 
     public function findBy(array $data): User
@@ -37,7 +38,18 @@ class UserRepository
     {
         $game = User::findOrFail($id);
 
-        $game->update(array_filter($data));
+        $game->update($data);
+
+        return $game->refresh();
+    }
+
+    public function updateRole(int $id, string $role): User
+    {
+        $game = User::findOrFail($id);
+
+        $game->update([
+            'role_id' => Role::where('name', $role)->firstOrFail()->id,
+        ]);
 
         return $game->refresh();
     }

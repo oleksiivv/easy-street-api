@@ -28,7 +28,7 @@ class UpdateGameSecurityRequest extends FormRequest
     {
         $data = $this->validated();
 
-        $gameSecurity = new GameSecurityDTO([$data['game_security']]);
+        $gameSecurity = new GameSecurityDTO($data);
 
         return new GameDTO([
             'game_security_data' => $gameSecurity,

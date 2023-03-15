@@ -9,6 +9,9 @@ use App\DTO\GameReleaseDTO;
 use App\DTO\GameSecurityDTO;
 use App\DTO\PaidProductDTO;
 use App\Models\Game;
+use App\Repositories\GameRepository;
+use App\Repositories\System\FileRepository;
+use App\System\OperatingSystem;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateGameRequest extends FormRequest
@@ -17,11 +20,12 @@ class CreateGameRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'genre' => 'required|in:' . join(',', Game::GENRES),
-            'status' => 'required|in: draft, in_review',
+            'genre' => 'required|string|in:' . join('","', Game::GENRES),
+            'status' => 'required|string|in:' . join('", "', Game::STATUSES_AVAILABLE_FOR_PUBLISHER),
             'tags' => 'required|array',
             'site' => 'nullable|string',
             'game_category_id' => 'nullable|int',
+            'company_id' => 'required|int',
 
             'game_page' => 'nullable|array',
             'game_page.short_description' => 'nullable|string',
@@ -30,7 +34,7 @@ class CreateGameRequest extends FormRequest
             'game_page.background_image_url' => 'nullable|string',
             'game_page.description_images' => 'nullable|array',
 
-            'game_release' => 'nullable_array',
+            'game_release' => 'nullable|array',
             'game_release.version' => 'nullable|string',
             'game_release.android_file_url' => 'nullable|string',
             'game_release.ios_file_url' => 'nullable|string',
@@ -58,12 +62,12 @@ class CreateGameRequest extends FormRequest
 
     public function getGameDTO(): GameDTO
     {
-        $data = $this->validated();
+        $data = $this->all();
 
-        $paidProduct = new PaidProductDTO([$data['paid_product']]);
-        $gamePage = new GamePageDTO([$data['game_page']]);
-        $gameRelease = new GameReleaseDTO([$data['game_release']]);
-        $gameSecurity = new GameSecurityDTO([$data['game_security']]);
+        $paidProduct = data_get($data, 'paid_product') ? new PaidProductDTO(data_get($data, 'paid_product')) : null;
+        $gamePage = data_get($data, 'game_page') ? new GamePageDTO(data_get($data, 'game_page')) : null;
+        $gameRelease = data_get($data, 'game_release') ? new GameReleaseDTO(data_get($data, 'game_release')) : null;
+        $gameSecurity = data_get($data, 'game_security') ? new GameSecurityDTO(data_get($data, 'game_security')) : null;
 
         $game = new GameDTO([
             'name' => data_get($data, 'name'),
@@ -72,6 +76,7 @@ class CreateGameRequest extends FormRequest
             'tags' => data_get($data, 'tags'),
             'site' => data_get($data, 'site'),
             'game_category_id' => data_get($data, 'game_category_id'),
+            'company_id' => data_get($data, 'company_id'),
             'paid_product_data' => $paidProduct,
             'game_page_data' => $gamePage,
             'game_release_data' => $gameRelease,

@@ -4,13 +4,14 @@ namespace App\Repositories;
 
 
 use App\Models\Company;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class CompanyRepository
 {
     public function get(int $id): Company
     {
-        return Company::findOrFail($id);
+        return Company::findOrFail($id)->load('games');
     }
 
     public function list(array $filter = [], string $sort = 'id', string $direction = Company::COMPANY_SORT_DIRECTION_ASC): Collection
@@ -26,15 +27,15 @@ class CompanyRepository
 
     public function create(array $data): Company
     {
-        return Company::create(array_filter($data));
+        return Company::create($data);
     }
 
     public function update(int $id, array $data): Company
     {
-        $game = Company::findOrFail($id);
+        $company = Company::findOrFail($id);
 
-        $game->update(array_filter($data));
+        $company->update($data);
 
-        return $game->refresh();
+        return $company->refresh();
     }
 }

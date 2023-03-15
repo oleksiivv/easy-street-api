@@ -18,6 +18,8 @@ class CustomerGame extends Model
         'download_datetime',
         'game_id',
         'user_id',
+        'os',
+        'version',
     ];
 
     public function game(): BelongsTo

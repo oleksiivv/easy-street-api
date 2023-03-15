@@ -18,6 +18,8 @@ class GameDTO extends DataTransferObject
 
     public ?int $game_category_id;
 
+    public ?int $company_id;
+
     public ?GameReleaseDTO $game_release_data;
 
     public ?GamePageDTO $game_page_data;
@@ -27,4 +29,6 @@ class GameDTO extends DataTransferObject
     public ?GameCategoryDTO $game_category_data;
 
     public ?PaidProductDTO $paid_product_data;
+
+    public bool $approved = false;
 }
