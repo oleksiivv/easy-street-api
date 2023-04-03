@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('/publisher/company', [CompanyController::class, 'create']);
+
 Route::group(['prefix' => '/publisher', 'middleware' => 'publisher-access'], function () {
     Route::group(['prefix' => '/game'], function () {
         Route::post('/', [PublisherGameController::class, 'createGame']);
@@ -34,6 +36,7 @@ Route::group(['prefix' => '/publisher', 'middleware' => 'publisher-access'], fun
 
         Route::group(['prefix' => '/{gameId}/update'], function () {
             Route::put('/release', [PublisherGameController::class, 'updateGameRelease']);
+            Route::put('/links', [PublisherGameController::class, 'updateGameLinks']);
             Route::post('/release/files', [PublisherGameController::class, 'updateGameReleaseFiles']);
             Route::put('/security', [PublisherGameController::class, 'updateGameSecurity']);
             Route::put('/page', [PublisherGameController::class, 'updateGamePage']);
@@ -60,6 +63,10 @@ Route::group(['prefix' => '/publisher', 'middleware' => 'publisher-access'], fun
         Route::post('/', [CompanyController::class, 'create']);
         Route::put('/{id}', [CompanyController::class, 'update']);
 
+
+        Route::get('/game/{gameId}/actions', [\App\Http\Controllers\PublisherGameActionsController::class, 'allPublisherActionsForGame']);
+        Route::get('/game/{gameId}/actions/all', [\App\Http\Controllers\PublisherGameActionsController::class, 'allForGame']);
+
         Route::group(['prefix' => '/{id}/team'], function () {
             Route::get('/', [CompanyController::class, 'getTeam']);
             Route::post('/team-member', [CompanyController::class, 'addTeamMember']);
@@ -75,6 +82,8 @@ Route::group(['prefix' => '/customer'], function () {
 
     Route::group(['prefix' => '/game'], function () {
         Route::get('/', [CustomerGameController::class, 'index']);
+        Route::get('/categories', [CustomerGameController::class, 'categories']);
+        Route::get('/genres', [CustomerGameController::class, 'groupGamesByGenres']);
         Route::get('/{id}', [CustomerGameController::class, 'getGame'])->whereNumber('id');
         Route::get('/{id}/stats', [CustomerGameController::class, 'gameStats'])->whereNumber('id');
         Route::get('/{id}/os', [CustomerGameController::class, 'getAvailableOSs'])->whereNumber('id');
@@ -121,7 +130,9 @@ Route::group(['prefix' => '/my-account'], function () {
 
     Route::group(['prefix' => '/{id}/card'], function (){
         Route::get('/', [AccountPaymentCardController::class, 'index']);
+        Route::get('/default', [AccountPaymentCardController::class, 'getDefault']);
         Route::post('/', [AccountPaymentCardController::class, 'add']);
+        Route::put('/{cardId}/make-default', [AccountPaymentCardController::class, 'makeDefault']);
         Route::delete('/all', [AccountPaymentCardController::class, 'deleteAll']);
         Route::delete('/{cardId}', [AccountPaymentCardController::class, 'delete']);
     });
@@ -162,7 +173,14 @@ Route::group(['prefix' => '/moderator', 'middleware' => 'moderator-access'], fun
         Route::group(['prefix' => '/{gameId}'], function () {
             Route::get('/', [\App\Http\Controllers\Administration\ModeratorController::class, 'getGame']);
             Route::put('/', [\App\Http\Controllers\Administration\ModeratorController::class, 'updateGame']);
+            Route::put('/es-index', [\App\Http\Controllers\Administration\ModeratorController::class, 'updateGameESIndex']);
+
+            Route::get('/actions/{moderatorId}', [\App\Http\Controllers\Administration\ModeratorGameActionsController::class, 'allForModeratorByGame']);
         });
+    });
+
+    Route::group(['prefix' => '{moderatorId}/actions'], function () {
+        Route::get('/', [\App\Http\Controllers\Administration\ModeratorGameActionsController::class, 'allForModerator']);
     });
 });
 

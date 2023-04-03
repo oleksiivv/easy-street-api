@@ -46,4 +46,9 @@ class Company extends Model
     {
         return $this->hasMany(Game::class, 'company_id');
     }
+
+    public function gameActions(): HasMany
+    {
+        return $this->hasMany(GameAction::class, 'user_id');
+    }
 }

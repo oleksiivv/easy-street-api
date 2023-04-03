@@ -70,4 +70,9 @@ class User extends Model
     {
         return $this->hasMany(Subscription::class);
     }
+
+    public function gameActions(): HasMany
+    {
+        return $this->hasMany(GameAction::class, 'user_id');
+    }
 }

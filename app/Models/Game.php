@@ -36,13 +36,14 @@ class Game extends Model
         'game_category_id',
         'company_id',
         'approved',
+        'es_index'
     ];
 
     protected $casts = [
         'tags' => 'json',
     ];
 
-    public const RELATIONS = ['gamePage', 'gameSecurity', 'gameReleases', 'paidProduct', 'gameCategory', 'publisher', 'customerGames'];
+    public const RELATIONS = ['gamePage', 'gameLinks', 'gameSecurity', 'gameReleases', 'paidProduct', 'gameCategory', 'publisher', 'customerGames'];
 
     public function gamePage(): HasOne
     {
@@ -62,6 +63,11 @@ class Game extends Model
     public function paidProduct(): HasOne
     {
         return $this->hasOne(PaidProduct::class);
+    }
+
+    public function gameLinks(): HasOne
+    {
+        return $this->hasOne(GameLink::class);
     }
 
     public function gameCategory(): BelongsTo
@@ -84,6 +90,11 @@ class Game extends Model
         return $this->hasMany(Like::class);
     }
 
+    public function downloads(): HasMany
+    {
+        return $this->hasMany(Download::class);
+    }
+
     public function getReleaseByOs(string $os): string
     {
         return match ($os) {
@@ -92,5 +103,10 @@ class Game extends Model
             OperatingSystem::WINDOWS => $this->gameReleases->last()->windows_file_url,
             OperatingSystem::OTHER => $this->gameReleases->last()->linux_file_url,
         };
+    }
+
+    public function gameActions(): HasMany
+    {
+        return $this->hasMany(GameAction::class);
     }
 }

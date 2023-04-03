@@ -14,6 +14,7 @@ class RateGameUseCase
 {
     public function __construct(
         private LikesRepository $likesRepository,
+        private GameRepository $gameRepository,
     ) {
     }
 
@@ -24,5 +25,7 @@ class RateGameUseCase
             'game_id' => $gameId,
             'user_id' => $customerId,
         ]);
+
+        $this->gameRepository->addToESIndex($gameId, 50);
     }
 }

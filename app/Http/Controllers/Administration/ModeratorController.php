@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Administration;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Administration\UpdateGameESIndexRequest;
 use App\Http\Requests\Administration\UpdateGameRequest;
+use App\Models\GameAction;
+use App\Repositories\GameActionRepository;
 use App\Repositories\GameRepository;
 use App\Services\MailService;
 use App\UseCases\UpdateGameUseCase;
@@ -16,6 +19,7 @@ class ModeratorController extends Controller
         private GameRepository $gameRepository,
         private UpdateGameUseCase $updateGameUseCase,
         private MailService $mailService,
+        private GameActionRepository $gameActionRepository
     ) {
     }
 
@@ -53,6 +57,31 @@ class ModeratorController extends Controller
                 'gameId' => $gameId,
             ], 'Game Status Updates');
         }
+
+        $this->gameActionRepository->create([
+            'game_id' => $gameId,
+            'type' => $game->approved ? 'approve' : 'update',
+            'fields' => ['status'],
+            'user_id' => $request->user_id,
+            'performed_by' => GameAction::PERFORMED_BY_MODERATOR,
+        ]);
+
+        return new Response($game);
+    }
+
+    public function updateGameESIndex(int $gameId, UpdateGameESIndexRequest $request): Response
+    {
+        $game = $this->gameRepository->updateByArray($gameId, [
+            'es_index' => $request->es_index,
+        ]);
+
+        $this->gameActionRepository->create([
+            'game_id' => $gameId,
+            'type' => 'update',
+            'fields' => ['es_index'],
+            'user_id' => $request->user_id,
+            'performed_by' => GameAction::PERFORMED_BY_MODERATOR,
+        ]);
 
         return new Response($game);
     }

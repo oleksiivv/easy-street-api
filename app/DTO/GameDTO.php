@@ -8,6 +8,8 @@ class GameDTO extends DataTransferObject
 {
     public ?string $name;
 
+    public ?int $es_index;
+
     public ?string $genre;
 
     public ?string $status;
@@ -29,6 +31,8 @@ class GameDTO extends DataTransferObject
     public ?GameCategoryDTO $game_category_data;
 
     public ?PaidProductDTO $paid_product_data;
+
+    public ?GameLinksDTO $links;
 
     public bool $approved = false;
 }

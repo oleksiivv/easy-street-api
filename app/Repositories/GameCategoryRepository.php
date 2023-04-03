@@ -29,6 +29,14 @@ class GameCategoryRepository
         return GameCategory::where($criteria)->get();
     }
 
+    public function all(): Collection
+    {
+        return GameCategory::withCount('downloads')
+            ->orderBy('downloads_count', 'desc')
+            ->get()
+            ->load('games');
+    }
+
     public function createIfNotExists(GameCategoryDTO $data): GameCategory
     {
         $game = GameCategory::create($data->toArray());

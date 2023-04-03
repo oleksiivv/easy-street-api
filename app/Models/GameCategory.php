@@ -28,4 +28,9 @@ class GameCategory extends Model
     {
         return $this->hasMany(Game::class);
     }
+
+    public function downloads(): HasMany
+    {
+        return $this->hasMany(Download::class, 'category_id');
+    }
 }

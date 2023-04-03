@@ -16,6 +16,7 @@ class UserPaymentCardDataRepository
 
             return UserPaymentCard::where([
                 'user_id' => $userId,
+                'is_default' => true,
             ])->firstOrFail();
         } catch (Throwable) {
             return UserPaymentCard::create(array_merge($data, [
@@ -39,6 +40,11 @@ class UserPaymentCardDataRepository
         return $payment->refresh();
     }
 
+    public function updateBy(array $search, array $data): void
+    {
+        UserPaymentCard::where($search)->update($data);
+    }
+
     public function deleteAll(int $userId): void
     {
         UserPaymentCard::where([
@@ -48,7 +54,11 @@ class UserPaymentCardDataRepository
 
     public function delete(int $id): void
     {
-        UserPaymentCard::findOrFail($id)->delete();
+        $card = UserPaymentCard::findOrFail($id);
+
+        Assert::false($card->is_default);
+
+        $card->delete();
     }
 
     public function findBy(array $criteria): Collection

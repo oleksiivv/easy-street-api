@@ -5,6 +5,7 @@ namespace App\UseCases;
 use App\Models\Company;
 use App\Models\Role;
 use App\Repositories\CompanyRepository;
+use App\Repositories\UserPaymentCardDataRepository;
 use App\Repositories\UserRepository;
 use App\Services\MailService;
 use App\Services\PaymentService;
@@ -20,6 +21,7 @@ class CreateCompanyUseCase
         private PaymentService $paymentService,
         private MailService $mailService,
         private UserRepository $userRepository,
+        private UserPaymentCardDataRepository $userPaymentCardDataRepository,
     ) {
     }
 
@@ -33,9 +35,22 @@ class CreateCompanyUseCase
             if ($full) {
                 $this->paymentService->init();
 
+                $paymentCardData = $this->userPaymentCardDataRepository->findOrCreate($company->publisher->id, array_merge(
+                    $creditCardData ?? [],
+                    [
+                        'address' => $company->address,
+                        'is_default' => true,
+                    ]
+                ));
+
                 $customer = $this->paymentService->createCustomer([
-                    'card' => $creditCardData,
-                    'address' => $company->address,
+                    'card' => [
+                        'number' => $paymentCardData->number,
+                        'cvc' => $paymentCardData->cvc,
+                        'exp_month' => $paymentCardData->exp_month,
+                        'exp_year' => $paymentCardData->exp_year
+                    ],
+                    'address' => $paymentCardData->address,
                     'email' => $company->publisher->email,
                     'name' => $company->name . '#' . $company->publisher->email,
                 ]);

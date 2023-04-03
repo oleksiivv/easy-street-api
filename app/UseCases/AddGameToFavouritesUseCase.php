@@ -20,6 +20,8 @@ class AddGameToFavouritesUseCase
     {
         $game = $this->gameRepository->get($gameId);
 
+        $this->gameRepository->addToESIndex($gameId, 50);
+
         $this->customerGameRepository->updateOrCreate(
             [
                 'game_id' => $gameId,

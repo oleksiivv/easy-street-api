@@ -20,6 +20,8 @@ class RemoveGameFromFavouritesUseCase
     {
         $game = $this->gameRepository->get($gameId);
 
+        $this->gameRepository->addToESIndex($gameId, -10);
+
         $this->customerGameRepository->updateOrCreate(
             [
                 'game_id' => $gameId,

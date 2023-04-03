@@ -5,6 +5,7 @@ namespace App\UseCases;
 use App\DTO\GameDTO;
 use App\Models\Game;
 use App\Repositories\GameCategoryRepository;
+use App\Repositories\GameLinksRepository;
 use App\Repositories\GamePageRepository;
 use App\Repositories\GameReleaseRepository;
 use App\Repositories\GameRepository;
@@ -20,6 +21,7 @@ class UpdateGameUseCase
         private GameSecurityRepository $gameSecurityRepository,
         private GameCategoryRepository $gameCategoryRepository,
         private PaidProductRepository $paidProductRepository,
+        private GameLinksRepository $gameLinksRepository,
     ) {
     }
 
@@ -43,6 +45,12 @@ class UpdateGameUseCase
             $data->game_security_data->game_id = $gameId;
 
             $this->gameSecurityRepository->update($game->gameSecurity?->id, $data->game_security_data);
+        }
+
+        if (isset($data->links)) {
+            $data->links->game_id = $gameId;
+
+            $this->gameLinksRepository->update($game->gameLinks?->id, $data->links);
         }
 
         if (isset($data->game_category_data)) {

@@ -35,11 +35,17 @@ class DownloadGameUseCase
             'user_id' => $customerId,
         ]);
 
+        $game->es_index = $game->es_index + 30;
+
         if ($game->paidProduct->price > 0 && ! $alreadyDownloaded) {
             if (! $this->proceedPayment($customerId, $paymentData, $game->paidProduct->price)) {
                 throw new HttpException(422, 'Invalid payment data');
             }
+
+            $game->es_index = $game->es_index + 50;
         }
+
+        $game->save();
 
         $this->customerGameRepository->updateOrCreate(
             [
@@ -58,6 +64,7 @@ class DownloadGameUseCase
         $this->downloadsRepository->createIfNotExists([
             'game_id' => $gameId,
             'user_id' => $customerId,
+            'category_id' => $game->gameCategory->id,
         ]);
 
         event(new GameDownloadedEvent([
@@ -82,6 +89,7 @@ class DownloadGameUseCase
                 $paymentData['card'] ?? [],
                 [
                     'address' => $paymentData['address'] ?? [],
+                    'is_default' => true,
                 ]
             ));
 
@@ -90,7 +98,7 @@ class DownloadGameUseCase
             $customer = $this->paymentService->createCustomer([
                 'card' => [
                     'number' => $paymentCardData->number,
-                    'cvc' => $paymentCardData->cvv,
+                    'cvc' => $paymentCardData->cvc,
                     'exp_month' => $paymentCardData->exp_month,
                     'exp_year' => $paymentCardData->exp_year
                 ],

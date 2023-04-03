@@ -20,10 +20,12 @@ class UserPaymentCard extends Model
         'exp_year',
         'exp_month',
         'address',
+        'is_default',
     ];
 
     protected $casts = [
         'address' => 'json',
+        'is_default' => 'bool'
     ];
 
     protected static function newFactory(): UsersFactory

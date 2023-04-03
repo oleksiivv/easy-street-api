@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\DTO\GameDTO;
 use App\Models\Game;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class GameRepository
 {
@@ -24,7 +25,7 @@ class GameRepository
             ->load(Game::RELATIONS);
     }
 
-    public function list(array $filter = [], string $sort = 'id', string $direction = Game::GAME_SORT_DIRECTION_ASC): Collection
+    public function list(array $filter = [], string $sort = 'es_index', string $direction = Game::GAME_SORT_DIRECTION_ASC): Collection
     {
         $games = Game::where($filter)->orderBy($sort, $direction)->get()->load(Game::RELATIONS);
 
@@ -61,4 +62,16 @@ class GameRepository
 
         return $game->load(Game::RELATIONS)->refresh();
     }
+
+    public function groupByGenres(): Collection
+    {
+        return Game::groupBy('genre')->select('genre', DB::raw('count(*) as total'))->get();
+    }
+
+    public function addToESIndex(int $gameId, int $number): void
+    {
+        $game = Game::findOrFail($gameId);
+        $game->es_index = $game->es_index + $number;
+        $game->save();
+     }
 }

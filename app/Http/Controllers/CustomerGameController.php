@@ -7,6 +7,7 @@ use App\Models\Game;
 use App\Models\User;
 use App\Repositories\CustomerGameRepository;
 use App\Repositories\DownloadsRepository;
+use App\Repositories\GameCategoryRepository;
 use App\Repositories\GameReleaseRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\LikesRepository;
@@ -37,6 +38,7 @@ class CustomerGameController extends Controller
         private LikesRepository $likesRepository,
         private GameReleaseRepository $gameReleaseRepository,
         private UserSubscriptionsRepository $userSubscriptionsRepository,
+        private GameCategoryRepository $gameCategoryRepository,
     ) {
     }
 
@@ -194,5 +196,15 @@ class CustomerGameController extends Controller
                 'os' => $os,
             ]) ? 'update' : 'download'
         );
+    }
+
+    public function categories(): Response
+    {
+        return new Response($this->gameCategoryRepository->all());
+    }
+
+    public function groupGamesByGenres(): Response
+    {
+        return new Response($this->gameRepository->groupByGenres());
     }
 }
