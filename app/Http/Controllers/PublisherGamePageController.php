@@ -23,7 +23,7 @@ class PublisherGamePageController extends Controller
 
     public function uploadBackground(int $gameId, UploadBackgroundImageRequest $uploadBackgroundImageRequest): Response
     {
-        dispatch_sync(new FileUploadUseCase($uploadBackgroundImageRequest->background_image, $gameId, OperatingSystem::PAGE_FILE_PREFIX_FOR_BACKGROUND, FileRepository::FILE_TYPE_DESCRIPTION_IMAGE));
+        dispatch_sync(new FileUploadUseCase($uploadBackgroundImageRequest->background_image, $gameId, OperatingSystem::PAGE_FILE_PREFIX_FOR_BACKGROUND, FileRepository::FILE_TYPE_BACKGROUND));
 
         return response()->noContent();
     }

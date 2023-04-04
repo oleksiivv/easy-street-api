@@ -13,9 +13,9 @@ class UpdateGamePageRequest extends FormRequest
         return [
             'short_description' => 'required|string',
             'long_description' => 'required|string',
-            'icon_url' => 'required|string',
-            'background_image_url' => 'required|string',
-            'description_images' => 'required|array',
+            'icon_url' => 'nullable|string',
+            'background_image_url' => 'nullable|string',
+            'description_images' => 'nullable|array',
         ];
     }
 
