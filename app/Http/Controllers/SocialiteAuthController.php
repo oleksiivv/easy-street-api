@@ -36,7 +36,8 @@ class SocialiteAuthController extends Controller
             if ($searchUser) {
                 $this->loginUseCase->handle($searchUser->toArray(), false);
 
-                return redirect('http://127.0.0.1:3000/account');
+                $href = env('CLIENT_URL');
+                return redirect("$href/account");
             } else {
                 $password = Str::uuid()->toString();
 
@@ -54,7 +55,8 @@ class SocialiteAuthController extends Controller
 
                 $this->loginUseCase->handle($user->toArray(), false);
 
-                return redirect('http://127.0.0.1:3000/account');
+                $href = env('CLIENT_URL');
+                return redirect("$href/account");
             }
 
         } catch (Exception $e) {
@@ -76,7 +78,8 @@ class SocialiteAuthController extends Controller
             if ($searchUser) {
                 $this->loginUseCase->handle($searchUser->toArray(), false);
 
-                return redirect('http://127.0.0.1:3000/account');
+                $href = env('CLIENT_URL');
+                return redirect("$href/account");
             } else {
                 $password = Str::uuid()->toString();
 
@@ -94,7 +97,8 @@ class SocialiteAuthController extends Controller
 
                 $this->loginUseCase->handle($user->toArray(), false);
 
-                return redirect('http://127.0.0.1:3000/account');
+                $href = env('CLIENT_URL');
+                return redirect("$href/account");
             }
 
         } catch (Exception $e) {
