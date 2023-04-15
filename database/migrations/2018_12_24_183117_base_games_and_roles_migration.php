@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
 
-            $table->string('email');
+            $table->string('email')->unique();
             $table->string('email_confirmation_token')->nullable();
             $table->boolean('email_is_confirmed')->default(false);
 
