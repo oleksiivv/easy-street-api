@@ -51,6 +51,7 @@ class RegisterUseCase
                 ], 'Email Confirmation');
             }
             catch (Throwable $exception) {
+                throw $exception;
                 throw new HttpException(422, "Wrong input data. Couldn't register your account. Please, try again.");
             }
         }
