@@ -13,7 +13,7 @@ use App\Repositories\GameRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use App\Services\MailService;
-use HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -53,7 +53,7 @@ class AddPublisherTeamMemberUseCase
                 })->toArray(),
             ]);
         } catch (Throwable $exception) {
-            throw new HttpException("Wrong input data. Couldn't add team member.", 422);
+            throw new HttpException(422, "Wrong input data. Couldn't add team member.");
         }
     }
 }

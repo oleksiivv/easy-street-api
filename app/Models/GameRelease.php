@@ -21,6 +21,12 @@ class GameRelease extends Model
         'linux_file_url',
         'release_date',
         'game_id',
+
+        'android_icon',
+        'ios_icon',
+        'windows_icon',
+        'mac_icon',
+        'linux_icon'
     ];
 
     public function game(): BelongsTo

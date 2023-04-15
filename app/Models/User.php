@@ -29,6 +29,11 @@ class User extends Model
         'password_sha',
         'update_password_token',
         'role_id',
+        'github_id',
+        'google_id',
+        'facebook_id',
+        'auth_type',
+        'icon'
     ];
 
     protected static function newFactory(): UsersFactory
@@ -43,7 +48,7 @@ class User extends Model
 
     public function userPaymentCard(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(UserPaymentCard::class);
     }
 
     public function customerGames(): HasMany

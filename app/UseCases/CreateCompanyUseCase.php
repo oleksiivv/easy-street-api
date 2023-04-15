@@ -2,9 +2,12 @@
 
 namespace App\UseCases;
 
+use App\Models\Administrator;
 use App\Models\Company;
+use App\Models\FinancialEvent;
 use App\Models\Role;
 use App\Repositories\CompanyRepository;
+use App\Repositories\FinancialEventRepository;
 use App\Repositories\UserPaymentCardDataRepository;
 use App\Repositories\UserRepository;
 use App\Services\MailService;
@@ -22,6 +25,7 @@ class CreateCompanyUseCase
         private MailService $mailService,
         private UserRepository $userRepository,
         private UserPaymentCardDataRepository $userPaymentCardDataRepository,
+        private FinancialEventRepository $financialEventRepository,
     ) {
     }
 
@@ -56,6 +60,12 @@ class CreateCompanyUseCase
                 ]);
 
                 $this->paymentService->pay($customer->id, Company::ACCOUNT_PRICE, []);
+
+                $this->financialEventRepository->create([
+                    'amount' => Company::ACCOUNT_PRICE,
+                    'partner_type' => FinancialEvent::PARTNER_TYPE_ES,
+                    'admin_id' => Administrator::firstOrFail()->id,
+                ]);
             }
 
             $this->userRepository->updateRole($company->publisher->id, Role::ROLE_PUBLISHER);

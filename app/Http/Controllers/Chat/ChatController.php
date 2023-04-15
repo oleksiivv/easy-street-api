@@ -39,6 +39,19 @@ class ChatController extends Controller
         ]);
     }
 
+    public function getByUserId(int $userId): Response
+    {
+        $chats = $this->chatRepository->getByUserId($userId)->map(function ($item) {
+            $item['last_message'] = $this->messageRepository->getLastByChatId($item->id);
+
+            return $item;
+        });
+
+        return new Response([
+            'chats' => $chats,
+        ]);
+    }
+
     public function getChatIdByGameId(int $gameId): Response
     {
         $chat = $this->chatRepository->getByGameId($gameId);

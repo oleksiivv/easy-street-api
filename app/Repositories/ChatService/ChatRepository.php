@@ -3,6 +3,7 @@
 namespace App\Repositories\ChatService;
 
 use App\Models\Chat;
+use Illuminate\Support\Collection;
 
 class ChatRepository
 {
@@ -16,6 +17,13 @@ class ChatRepository
         return Chat::where([
             'game_id' => $gameId
         ])->first();
+    }
+
+    public function getByUserId(int $userId): Collection
+    {
+        return Chat::query()->whereHas('messages', function ($query) use ($userId) {
+            $query->where('user_id', '=', $userId);
+        })->get()->load('game', 'game.gamePage');
     }
 
     public function exists(int $chatId): bool

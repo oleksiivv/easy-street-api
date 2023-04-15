@@ -17,13 +17,18 @@ class LoginUseCase
     {
     }
 
-    public function handle(array $data): User
+    public function handle(array $data, bool $checkPassword = true): User
     {
         try {
-            $user = $this->userRepository->findBy([
+            $searchParams = [
                 'email' => $data['email'],
-                'password_sha' => sha1($data['password']),
-            ]);
+            ];
+
+            if ($checkPassword) {
+                $searchParams['password_sha'] = sha1($data['password']);
+            }
+
+            $user = $this->userRepository->findBy($searchParams);
 
             $this->managementTokenRepository->storeUser($user);
 

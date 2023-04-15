@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerGameController;
 use App\Http\Controllers\CustomerPublishersController;
 use App\Http\Controllers\PublisherGameController;
 use App\Http\Controllers\PublisherGamePageController;
+use App\Http\Controllers\SocialiteAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -152,6 +153,8 @@ Route::group(['prefix' => '/test'], function () {
 });
 
 Route::group(['prefix' => '/chat'], function () {
+    Route::get('/user/{userId}', [\App\Http\Controllers\Chat\ChatController::class, 'getByUserId'])->middleware('customer-access');
+
     Route::post('/', [\App\Http\Controllers\Chat\ChatController::class, 'create'])->middleware('publisher-access');
 
     Route::get('/game/{gameId}', [\App\Http\Controllers\Chat\ChatController::class, 'getByGameId'])->middleware('customer-access');
@@ -192,4 +195,18 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin-access'], function ()
             Route::post('/', [\App\Http\Controllers\Administration\AdministratorController::class, 'createModerator']);
         });
     });
+});
+
+Route::group(['prefix' => '/financial-events'], function () {
+    Route::get('/company/{companyId}/total-amount', [\App\Http\Controllers\FinancialEventsController::class, 'getAmountForCompany']);
+    Route::get('/admin/{adminId}/total-amount', [\App\Http\Controllers\FinancialEventsController::class, 'getAmountForAdmin']);
+});
+
+Route::group(['prefix' => '/payouts'], function () {
+    Route::get('/user/{userId}', [\App\Http\Controllers\PayoutsController::class, 'getByUserId']);
+    Route::post('/', [\App\Http\Controllers\PayoutsController::class, 'create']);
+    Route::post('/{id}/approve', [\App\Http\Controllers\PayoutsController::class, 'approvePayout']);
+
+    Route::get('/', [\App\Http\Controllers\PayoutsController::class, 'all']);
+    Route::get('/{id}', [\App\Http\Controllers\PayoutsController::class, 'get']);
 });

@@ -40,6 +40,14 @@ class GameReleaseRepository
             'windows_file_url' => $release->windows_file_url,
             'mac_file_url' => $release->mac_file_url,
             'linux_file_url' => $release->linux_file_url,
+
+            'images' => [
+                'android_file_url' => $release->android_icon,
+                'ios_file_url' => $release->ios_icon,
+                'windows_file_url' => $release->windows_icon,
+                'mac_file_url' => $release->mac_icon,
+                'linux_file_url' => $release->linux_icon,
+            ],
         ]);
     }
 

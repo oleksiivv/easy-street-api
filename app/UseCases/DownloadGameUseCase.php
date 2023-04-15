@@ -3,11 +3,15 @@
 namespace App\UseCases;
 
 use App\Events\GameDownloadedEvent;
+use App\Models\Administrator;
 use App\Models\Company;
+use App\Models\FinancialEvent;
+use App\Models\Game;
 use App\Models\Role;
 use App\Models\UserPaymentCard;
 use App\Repositories\CustomerGameRepository;
 use App\Repositories\DownloadsRepository;
+use App\Repositories\FinancialEventRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\UserPaymentCardDataRepository;
 use App\Services\PaymentService;
@@ -23,6 +27,7 @@ class DownloadGameUseCase
         private DownloadsRepository $downloadsRepository,
         private PaymentService $paymentService,
         private UserPaymentCardDataRepository $userPaymentCardDataRepository,
+        private FinancialEventRepository $financialEventRepository,
     ) {
     }
 
@@ -38,7 +43,7 @@ class DownloadGameUseCase
         $game->es_index = $game->es_index + 30;
 
         if ($game->paidProduct->price > 0 && ! $alreadyDownloaded) {
-            if (! $this->proceedPayment($customerId, $paymentData, $game->paidProduct->price)) {
+            if (! $this->proceedPayment($customerId, $paymentData, $game->paidProduct->price, $game)) {
                 throw new HttpException(422, 'Invalid payment data');
             }
 
@@ -80,7 +85,7 @@ class DownloadGameUseCase
         return OperatingSystem::EXTENSIONS[$os];
     }
 
-    private function proceedPayment(int $userId, ?array $paymentData, int $gamePrice): bool
+    private function proceedPayment(int $userId, ?array $paymentData, int $gamePrice, Game $game): bool
     {
         $this->paymentService->init();
 
@@ -111,6 +116,18 @@ class DownloadGameUseCase
         } catch (Throwable $exception){
             throw $exception;
         }
+
+        $this->financialEventRepository->create([
+            'amount' => $gamePrice / 2,
+            'partner_type' => FinancialEvent::PARTNER_TYPE_ES,
+            'admin_id' => Administrator::firstOrFail()->id,
+        ]);
+
+        $this->financialEventRepository->create([
+            'amount' => $gamePrice / 2,
+            'partner_type' => FinancialEvent::PARTNER_TYPE_PUBLISHER,
+            'company_id' => $game->publisher->publisher_id,
+        ]);
 
         return true;
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SocialiteAuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('auth/github', [SocialiteAuthController::class, 'githubRedirect']);
+Route::get('auth/github/callback', [SocialiteAuthController::class, 'githubCallback']);
+
+Route::get('auth/google', [SocialiteAuthController::class, 'googleRedirect']);
+Route::get('auth/google/callback', [SocialiteAuthController::class, 'googleCallback']);

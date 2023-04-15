@@ -22,6 +22,7 @@ class PublicUserResource extends JsonResource
             'subscriptions' => $this->subscriptions,
             'likes' => $this->likes,
             'companies' => $this->companies,
+            'icon' => $this->icon
         ];
     }
 }

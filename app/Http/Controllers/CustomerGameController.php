@@ -46,8 +46,8 @@ class CustomerGameController extends Controller
     {
         $data = $this->gameRepository->list(
             $getGamesRequest->filters ?? [],
-            $getGamesRequest->sort ?? 'id',
-            $getGamesRequest->sort_direction ?? 'asc',
+            $getGamesRequest->sort ?? 'es_index',
+            $getGamesRequest->sort_direction ?? 'desc',
         );
 
         return new Response($data);
@@ -160,6 +160,9 @@ class CustomerGameController extends Controller
     {
         $versions = $this->gameReleaseRepository->getAvailableVersions($gameId);
 
+        $images = $versions['images'];
+        unset($versions['images']);
+
         $result = [];
 
         foreach ($versions as $key=>$value){
@@ -167,6 +170,7 @@ class CustomerGameController extends Controller
                 'os' => strtok($key, '_'),
                 'field' => $key,
                 'link' => $value,
+                'image' => $images[$key] ?? null,
             ];
         }
 
@@ -205,6 +209,9 @@ class CustomerGameController extends Controller
 
     public function groupGamesByGenres(): Response
     {
-        return new Response($this->gameRepository->groupByGenres());
+        return new Response($this->gameRepository->groupByGenres()->map(function ($item) {
+            $item['image'] = GameRepository::GAME_GENRES_IMAGES[$item['genre']];
+            return $item;
+        }));
     }
 }

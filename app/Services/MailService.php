@@ -61,4 +61,20 @@ class MailService
             $message->from(config('mail.from.address'), config('mail.from.name'));
         });
     }
+
+    public function sendPayoutRequestConfirmation(string $to, array $data, string $subject): void
+    {
+        Mail::send('payout_request_confirmation_email', $data, function ($message) use ($to, $subject) {
+            $message->to($to)->subject($subject);
+            $message->from(config('mail.from.address'), config('mail.from.name'));
+        });
+    }
+
+    public function sendPayoutRequestCreation(string $to, array $data, string $subject): void
+    {
+        Mail::send('payout_request_created_email', $data, function ($message) use ($to, $subject) {
+            $message->to($to)->subject($subject);
+            $message->from(config('mail.from.address'), config('mail.from.name'));
+        });
+    }
 }
