@@ -25,8 +25,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/publisher/company', [CompanyController::class, 'create']);
 
-Route::group(['prefix' => '/publisher', 'middleware' => 'publisher-access'], function () {
-    Route::group(['prefix' => '/game'], function () {
+Route::group(['prefix' => '/publisher'], function () {
+    Route::group(['prefix' => '/game', 'middleware' => 'publisher-access'], function () {
         Route::post('/', [PublisherGameController::class, 'createGame']);
         Route::put('/{id}', [PublisherGameController::class, 'updateGame']);
         Route::put('/{id}/release', [PublisherGameController::class, 'releaseGame']);
@@ -57,12 +57,12 @@ Route::group(['prefix' => '/publisher', 'middleware' => 'publisher-access'], fun
     });
 
     Route::group(['prefix' => '/company'], function () {
-        Route::get('/', [CompanyController::class, 'index']);
-        Route::get('/{id}', [CompanyController::class, 'get']);
-        Route::get('/{id}/stats', [CompanyController::class, 'stats']);
-        Route::get('/{id}/subscribers', [CompanyController::class, 'subscribers']);
+        Route::get('/', [CompanyController::class, 'index'])->middleware('publisher-access');
+        Route::get('/{id}', [CompanyController::class, 'get'])->middleware('publisher-access');
+        Route::get('/{id}/stats', [CompanyController::class, 'stats'])->middleware('publisher-access');
+        Route::get('/{id}/subscribers', [CompanyController::class, 'subscribers'])->middleware('publisher-access');
         Route::post('/', [CompanyController::class, 'create']);
-        Route::put('/{id}', [CompanyController::class, 'update']);
+        Route::put('/{id}', [CompanyController::class, 'update'])->middleware('publisher-access');
 
 
         Route::get('/game/{gameId}/actions', [\App\Http\Controllers\PublisherGameActionsController::class, 'allPublisherActionsForGame']);
