@@ -2,6 +2,7 @@
 
 namespace App\UseCases;
 
+use App\Http\Repositories\ManagementTokenRepository;
 use App\Models\Administrator;
 use App\Models\Company;
 use App\Models\FinancialEvent;
@@ -26,6 +27,7 @@ class CreateCompanyUseCase
         private UserRepository $userRepository,
         private UserPaymentCardDataRepository $userPaymentCardDataRepository,
         private FinancialEventRepository $financialEventRepository,
+        private ManagementTokenRepository $managementTokenRepository,
     ) {
     }
 
@@ -74,6 +76,9 @@ class CreateCompanyUseCase
                 'name' => $company->publisher->name,
                 'companyName' => $company->name,
             ], 'Company creating confirmation');
+
+            $this->managementTokenRepository->removeUser();
+            $this->managementTokenRepository->storeUser($company->publisher);
 
             return $company->refresh();
         } catch (ApiErrorException $exception){
