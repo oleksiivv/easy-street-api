@@ -34,7 +34,7 @@ class GameCategoryRepository
         return GameCategory::withCount('downloads')
             ->orderBy('downloads_count', 'desc')
             ->get()
-            ->load('games');
+            ->load('games', 'games.gamePage');
     }
 
     public function createIfNotExists(GameCategoryDTO $data): GameCategory

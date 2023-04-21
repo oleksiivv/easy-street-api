@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\DB;
 class GameRepository
 {
     public const GAME_GENRES_IMAGES = [
-        'arcade' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png'
+        'arcade' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
+        'strategy' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
+        'quiz' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
     ];
 
     public function get(int $id): Game
