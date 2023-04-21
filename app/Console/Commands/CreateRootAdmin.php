@@ -34,8 +34,9 @@ class CreateRootAdmin extends Command
      */
     public function handle(RoleRepository $roleRepository, AdministratorRepository $administratorRepository, UserRepository $userRepository)
     {
+        DB::table('financial_events')->truncate();
         DB::table('administrators_to_moderators_pivot')->truncate();
-        
+
         $user = $userRepository->findBy([
             'email' => env('ADMIN_EMAIL'),
         ]);
