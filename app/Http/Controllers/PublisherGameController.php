@@ -12,6 +12,7 @@ use App\Http\Requests\UpdateGameReleaseFilesRequest;
 use App\Http\Requests\UpdateGameReleaseRequest;
 use App\Http\Requests\UpdateGameRequest;
 use App\Http\Requests\UpdateGameSecurityRequest;
+use App\Models\Game;
 use App\Models\GameAction;
 use App\Repositories\DownloadsRepository;
 use App\Repositories\GameActionRepository;
@@ -79,6 +80,11 @@ class PublisherGameController extends Controller
         return new Response([
             'categories' => $categories,
         ]);
+    }
+
+    public function getGenres(int $companyId): Response
+    {
+        return new Response(Game::GENRES);
     }
 
     public function createGame(CreateGameRequest $createGameRequest): Response

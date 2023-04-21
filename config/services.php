@@ -36,11 +36,11 @@ return [
     'github' => [
         'client_id' => '6437af7f8577c7d106fd',
         'client_secret' => 'f0d11e3c8876a26a563da484bdb851173c66f23e',
-        'redirect' => 'http://127.0.0.1:8000/auth/github/callback',
+        'redirect' => env('BE_URL') . 'auth/github/callback',
     ],
     'google' => [
         'client_id' => '655210026855-a3qb2tsc4ggf4bsnitgffu8evbmhkqk9.apps.googleusercontent.com',
         'client_secret' => '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',
-        'redirect' => 'http://127.0.0.1:8000/auth/google/callback',
+        'redirect' => env('BE_URL') . 'auth/google/callback',
     ],
 ];

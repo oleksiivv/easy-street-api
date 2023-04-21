@@ -20,8 +20,8 @@ class CreateGameRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'genre' => 'required|string|in:' . join('","', Game::GENRES),
-            'status' => 'required|string|in:' . join('", "', Game::STATUSES_AVAILABLE_FOR_PUBLISHER),
+            'genre' => 'required|string',
+            'status' => 'required|string',
             'tags' => 'required|array',
             'site' => 'nullable|string',
             'game_category_id' => 'nullable|int',

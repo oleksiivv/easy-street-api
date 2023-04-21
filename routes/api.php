@@ -75,6 +75,7 @@ Route::group(['prefix' => '/publisher'], function () {
         });
 
         Route::get('/{id}/categories', [PublisherGameController::class, 'getCategories'])->whereNumber('id');
+        Route::get('/{id}/genres', [PublisherGameController::class, 'getGenres'])->whereNumber('id');
     });
 });
 
