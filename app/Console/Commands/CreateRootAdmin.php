@@ -39,6 +39,7 @@ class CreateRootAdmin extends Command
         ]);
 
         $user->role_id = $roleRepository->findByName(Role::ROLE_ADMIN);
+        $user->save();
 
         $administratorRepository->createOrUpdate($user->email, $user->email, $user->id);
 
