@@ -9,6 +9,7 @@ use App\Repositories\AdministratorRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class CreateRootAdmin extends Command
 {
@@ -33,6 +34,8 @@ class CreateRootAdmin extends Command
      */
     public function handle(RoleRepository $roleRepository, AdministratorRepository $administratorRepository, UserRepository $userRepository)
     {
+        DB::table('administrators_to_moderators_pivot')->truncate();
+        
         $user = $userRepository->findBy([
             'email' => env('ADMIN_EMAIL'),
         ]);
