@@ -2,7 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Administrator;
+use App\Models\Company;
+use App\Models\Role;
 use App\Repositories\AdministratorRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Console\Command;
 
@@ -27,11 +31,13 @@ class CreateRootAdmin extends Command
      *
      * @return int
      */
-    public function handle(AdministratorRepository $administratorRepository, UserRepository $userRepository)
+    public function handle(RoleRepository $roleRepository, AdministratorRepository $administratorRepository, UserRepository $userRepository)
     {
         $user = $userRepository->findBy([
             'email' => env('ADMIN_EMAIL'),
         ]);
+
+        $user->role_id = $roleRepository->findByName(Role::ROLE_ADMIN);
 
         $administratorRepository->createOrUpdate($user->email, $user->email, $user->id);
 
