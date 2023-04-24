@@ -15,7 +15,7 @@ class CustomerGameRepository
 
     public function list(array $filter = [], string $sort = 'id', string $direction = Game::GAME_SORT_DIRECTION_ASC): Collection
     {
-        $games = CustomerGame::where($filter)->orderBy($sort, $direction)->get();
+        $games = CustomerGame::where($filter)->orderBy($sort, $direction)->get()->load('game', 'game.gamePage');
 
         $result = collect([]);
         $result['data'] = $games;

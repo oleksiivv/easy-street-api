@@ -42,6 +42,13 @@ class GameRepository
         return $result;
     }
 
+    public function getBest(int $companyId): ?Game
+    {
+        return Game::where([
+            'company_id' => $companyId
+        ])->orderBy('es_index', 'desc')->first();
+    }
+
     public function create(GameDTO $data): Game
     {
         return Game::create(array_filter($data->toArray()));

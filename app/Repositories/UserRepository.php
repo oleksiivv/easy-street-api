@@ -10,7 +10,7 @@ class UserRepository
 {
     public function get(int $id): User
     {
-        return User::findOrFail($id)->load('role', 'likes', 'subscriptions', 'companies');
+        return User::findOrFail($id)->load('role', 'likes', 'subscriptions', 'companies', 'companies.games');
     }
 
     public function findBy(array $data): User

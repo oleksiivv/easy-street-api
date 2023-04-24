@@ -43,7 +43,7 @@ class CustomerPublishersController extends Controller
     {
         $data = $this->companyRepository->list(
             $getCompaniesRequest->filters ?? [],
-            $getCompaniesRequest->sort ?? 'id',
+            $getCompaniesRequest->sort ?? 'es_index',
             $getCompaniesRequest->sort_direction ?? 'asc',
         );
 
