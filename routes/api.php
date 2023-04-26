@@ -29,6 +29,8 @@ Route::group(['prefix' => '/publisher'], function () {
         Route::post('/', [PublisherGameController::class, 'createGame']);
         Route::put('/{id}', [PublisherGameController::class, 'updateGame']);
         Route::put('/{id}/release', [PublisherGameController::class, 'releaseGame']);
+        Route::put('/{id}/demo', [PublisherGameController::class, 'releaseGameAsDemo']);
+        Route::put('/{id}/draft', [PublisherGameController::class, 'makeDraft']);
         Route::get('/', [PublisherGameController::class, 'index']);
 
         Route::get('/{id}/stats', [PublisherGameController::class, 'gameStats'])->whereNumber('id');

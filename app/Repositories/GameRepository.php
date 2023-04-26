@@ -24,7 +24,8 @@ class GameRepository
 
     public function search(string $keyword): Collection
     {
-        return Game::query()->where('name', 'LIKE', '%'.$keyword.'%')
+        return Game::query()->whereIn('status', ['active', 'in_review', 'update_in_review'])
+            ->where('name', 'LIKE', '%'.$keyword.'%')
             ->orWhereHas('gamePage', function ($query) use ($keyword) {
                 $query->where('short_description', 'LIKE', '%'.$keyword.'%')
                     ->orWhere('long_description', 'LIKE', '%'.$keyword.'%');

@@ -102,6 +102,7 @@ class Game extends Model
             OperatingSystem::IOS => $this->gameReleases->last()->ios_file_url,
             OperatingSystem::WINDOWS => $this->gameReleases->last()->windows_file_url,
             OperatingSystem::OTHER => $this->gameReleases->last()->linux_file_url,
+            OperatingSystem::MAC => $this->gameReleases->last()->mac_file_url,
         };
     }
 

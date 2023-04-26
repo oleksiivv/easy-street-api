@@ -16,10 +16,10 @@ class GameReleaseRepository
         return GameRelease::create($data->toArray());
     }
 
-    public function update(?int $id, GameReleaseDTO $data): GameRelease
+    public function update(GameReleaseDTO $data): GameRelease
     {
         try {
-            $gameRelease = GameRelease::find($id);
+            $gameRelease = GameRelease::where('version', $data->version)->firstOrFail();
             $gameRelease->update(array_filter($data->toArray()));
 
             $gameRelease->save();

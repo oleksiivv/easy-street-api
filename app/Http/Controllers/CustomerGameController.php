@@ -97,6 +97,7 @@ class CustomerGameController extends Controller
                 'ios' => $this->getGameState($game, $userId, strtok(OperatingSystem::IOS, '_')),
                 'windows' => $this->getGameState($game, $userId, strtok(OperatingSystem::WINDOWS, '_')),
                 'linux' => $this->getGameState($game, $userId, strtok(OperatingSystem::OTHER, '_')),
+                'mac' => $this->getGameState($game, $userId, strtok(OperatingSystem::MAC, '_')),
             ],
             'liked' => $this->likesRepository->exists($game->id, $userId),
             'favourite' => $this->customerGameRepository->exists([

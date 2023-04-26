@@ -38,7 +38,7 @@ class UpdateGameUseCase
         if (isset($data->game_release_data)) {
             $data->game_release_data->game_id = $gameId;
 
-            $this->gameReleaseRepository->create($data->game_release_data, $gameId);
+            $this->gameReleaseRepository->update($data->game_release_data);
         }
 
         if (isset($data->game_security_data)) {

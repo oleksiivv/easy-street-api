@@ -138,6 +138,46 @@ class PublisherGameController extends Controller
         return new Response($game);
     }
 
+    public function releaseGameAsDemo(int $gameId, Request $request): Response
+    {
+        if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
+        $game = $this->gameRepository->updateByArray($gameId, [
+            'status' => 'demo',
+        ]);
+
+        $this->gameActionRepository->create([
+            'game_id' => $gameId,
+            'type' => 'release',
+            'fields' => ['status'],
+            'performed_by' => GameAction::PERFORMED_BY_COMPANY,
+        ]);
+
+        return new Response($game);
+    }
+
+    public function makeDraft(int $gameId, Request $request): Response
+    {
+        if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
+        $game = $this->gameRepository->updateByArray($gameId, [
+            'status' => 'draft',
+        ]);
+
+        $this->gameActionRepository->create([
+            'game_id' => $gameId,
+            'type' => 'release',
+            'fields' => ['status'],
+            'performed_by' => GameAction::PERFORMED_BY_COMPANY,
+        ]);
+
+        return new Response($game);
+    }
+
     public function updateGame(int $gameId, UpdateGameRequest $updateGameRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGameRequest, 'user.id'), $gameId)) {
@@ -171,6 +211,10 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
+        $game->status = 'update_in_review';
+        $game->save();
+        $game->refresh();
+
         return new Response($game);
     }
 
@@ -193,6 +237,9 @@ class PublisherGameController extends Controller
         if (isset($updateGameReleaseFilesRequest->windows_file_url)) {
             $this->fileRepository->uploadFile($game, $updateGameReleaseFilesRequest->windows_file_url, true, OperatingSystem::WINDOWS, FileRepository::FILE_TYPE_RELEASE);
         }
+        if (isset($updateGameReleaseFilesRequest->mac_file_url)) {
+            $this->fileRepository->uploadFile($game, $updateGameReleaseFilesRequest->mac_file_url, true, OperatingSystem::MAC, FileRepository::FILE_TYPE_RELEASE);
+        }
         if (isset($updateGameReleaseFilesRequest->linux_file_url)) {
             $this->fileRepository->uploadFile($game, $updateGameReleaseFilesRequest->linux_file_url, true, OperatingSystem::OTHER, FileRepository::FILE_TYPE_RELEASE);
         }
@@ -203,6 +250,10 @@ class PublisherGameController extends Controller
             'fields' => ['files'],
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
+
+        $game->status = 'update_in_review';
+        $game->save();
+        $game->refresh();
 
         return new Response($game->refresh());
     }
@@ -222,6 +273,10 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
+        $game->status = 'update_in_review';
+        $game->save();
+        $game->refresh();
+
         return new Response($game);
     }
 
@@ -239,6 +294,10 @@ class PublisherGameController extends Controller
             'fields' => [$updateGameLinksRequest->getGameDTO()->links->toArray()],
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
+
+        $game->status = 'update_in_review';
+        $game->save();
+        $game->refresh();
 
         return new Response($game);
     }
@@ -258,6 +317,10 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
+        $game->status = 'update_in_review';
+        $game->save();
+        $game->refresh();
+
         return new Response($game);
     }
 
@@ -276,6 +339,10 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
+        $game->status = 'update_in_review';
+        $game->save();
+        $game->refresh();
+
         return new Response($game);
     }
 
@@ -293,6 +360,10 @@ class PublisherGameController extends Controller
             'fields' => [$updateGameCategoryRequest->getGameDTO()->game_category_data->toArray()],
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
+
+        $game->status = 'update_in_review';
+        $game->save();
+        $game->refresh();
 
         return new Response($game);
     }
