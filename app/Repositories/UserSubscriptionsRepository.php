@@ -24,7 +24,7 @@ class UserSubscriptionsRepository
 
     public function list(array $data): Collection
     {
-        return Subscription::where($data)->get()->load('user', 'publisher', 'publisher.games');
+        return Subscription::where($data)->get()->load('user', 'publisher', 'publisher.games', 'publisher.games.gamePage');
     }
 
     public function getCount(int $companyId): int

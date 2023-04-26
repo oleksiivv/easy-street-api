@@ -22,6 +22,10 @@ class ModeratorAccessMiddleware
             throw new HttpException(422);
         }
 
+        if (!data_get($data, 'user.email_is_confirmed', false)) {
+            throw new HttpException(422);
+        }
+
         return $next($request);
     }
 }

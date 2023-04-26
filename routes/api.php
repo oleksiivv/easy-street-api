@@ -8,7 +8,6 @@ use App\Http\Controllers\CustomerGameController;
 use App\Http\Controllers\CustomerPublishersController;
 use App\Http\Controllers\PublisherGameController;
 use App\Http\Controllers\PublisherGamePageController;
-use App\Http\Controllers\SocialiteAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -65,13 +64,13 @@ Route::group(['prefix' => '/publisher'], function () {
         Route::put('/{id}', [CompanyController::class, 'update'])->middleware('publisher-access');
 
 
-        Route::get('/game/{gameId}/actions', [\App\Http\Controllers\PublisherGameActionsController::class, 'allPublisherActionsForGame']);
-        Route::get('/game/{gameId}/actions/all', [\App\Http\Controllers\PublisherGameActionsController::class, 'allForGame']);
+        Route::get('/game/{gameId}/actions', [\App\Http\Controllers\PublisherGameActionsController::class, 'allPublisherActionsForGame'])->middleware('publisher-access');
+        Route::get('/game/{gameId}/actions/all', [\App\Http\Controllers\PublisherGameActionsController::class, 'allForGame'])->middleware('publisher-access');
 
         Route::group(['prefix' => '/{id}/team'], function () {
-            Route::get('/', [CompanyController::class, 'getTeam']);
-            Route::post('/team-member', [CompanyController::class, 'addTeamMember']);
-            Route::delete('/team-member', [CompanyController::class, 'removeTeamMember']);
+            Route::get('/', [CompanyController::class, 'getTeam'])->middleware('publisher-access');
+            Route::post('/team-member', [CompanyController::class, 'addTeamMember'])->middleware('publisher-access');
+            Route::delete('/team-member', [CompanyController::class, 'removeTeamMember'])->middleware('publisher-access');
         });
 
         Route::get('/{id}/categories', [PublisherGameController::class, 'getCategories'])->whereNumber('id');
@@ -85,6 +84,7 @@ Route::group(['prefix' => '/customer'], function () {
     Route::group(['prefix' => '/game'], function () {
         Route::get('/', [CustomerGameController::class, 'index']);
         Route::get('/categories', [CustomerGameController::class, 'categories']);
+        Route::get('/recommendations', [CustomerPublishersController::class, 'recomendations']);
         Route::get('/genres', [CustomerGameController::class, 'groupGamesByGenres']);
         Route::get('/{id}', [CustomerGameController::class, 'getGame'])->whereNumber('id');
         Route::get('/{id}/stats', [CustomerGameController::class, 'gameStats'])->whereNumber('id');
@@ -154,6 +154,8 @@ Route::group(['prefix' => '/test'], function () {
 });
 
 Route::group(['prefix' => '/chat'], function () {
+    Route::get('/all', [\App\Http\Controllers\Chat\ChatController::class, 'activeChats']);
+
     Route::get('/user/{userId}', [\App\Http\Controllers\Chat\ChatController::class, 'getByUserId'])->middleware('customer-access');
 
     Route::post('/', [\App\Http\Controllers\Chat\ChatController::class, 'create'])->middleware('publisher-access');

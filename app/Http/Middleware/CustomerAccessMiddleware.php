@@ -22,6 +22,12 @@ class CustomerAccessMiddleware
             throw new HttpException(422);
         }
 
+        if (!data_get($data, 'user.email_is_confirmed', false)) {
+            throw new HttpException(422);
+        }
+
+        $request->merge(['user' => $data['user']]);
+
         return $next($request);
     }
 }

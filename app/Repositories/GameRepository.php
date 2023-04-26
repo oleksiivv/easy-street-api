@@ -15,6 +15,8 @@ class GameRepository
         'quiz' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
     ];
 
+    public const GAME_PAGINATION_PER_PAGE = 3;
+
     public function get(int $id): Game
     {
         return Game::findOrFail($id)->load(Game::RELATIONS);
@@ -31,13 +33,51 @@ class GameRepository
             ->load(Game::RELATIONS);
     }
 
-    public function list(array $filter = [], string $sort = 'es_index', string $direction = Game::GAME_SORT_DIRECTION_ASC): Collection
+    public function list(array $filter = [], string $sort = 'es_index', string $direction = Game::GAME_SORT_DIRECTION_ASC, ?int $page = null): Collection
     {
-        $games = Game::where($filter)->orderBy($sort, $direction)->get()->load(Game::RELATIONS);
+        if (isset($filter['status'])) {
+            $games = Game::whereIn('status', json_decode($filter['status']));
+        }
+
+        if (isset($filter['os']) && $filter['os'] != 'undefined') {
+            $filter['os'] = json_decode($filter['os']);
+            $games = isset($games) ? $games->with('gameReleases', function ($query) use ($filter) {
+                return $query->where(array_map(function ($field) {
+                    return [$field, '<>', null];
+                }, $filter['os']));
+            }) : Game::with('gameReleases', function ($query) use ($filter) {
+                return $query->where(array_map(function ($field) {
+                    return [$field, '<>', null];
+                }, $filter['os']));
+            });
+        } else {
+            $games = $games ?? Game::where($filter);
+        }
+
+        $gamesCount = $games?->count() ?? 0;
+
+        if ($sort === 'downloads') {
+            $games = $games->withCount('downloads')->orderBy('downloads_count', 'desc');
+        } elseif ($sort === 'likes') {
+            $games = $games->withCount('likes')->orderBy('likes_count', 'desc');
+        } else {
+            $games = $games->orderBy($sort, $direction);
+        }
+
+        if (!isset($page)) {
+            $games = $games->get()->load(Game::RELATIONS);
+        } else {
+            $games = $games->skip(($page - 1) * self::GAME_PAGINATION_PER_PAGE)
+                ->take(self::GAME_PAGINATION_PER_PAGE)
+                ->get()->load(Game::RELATIONS);
+        }
 
         $result = collect([]);
         $result['data'] = $games;
-        $result['pagination'] = [];
+        $result['pagination'] = [
+            'page' => $page,
+            'pages' => ceil($gamesCount / self::GAME_PAGINATION_PER_PAGE),
+        ];
 
         return $result;
     }

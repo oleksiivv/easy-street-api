@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CustomerGameController extends Controller
 {
@@ -44,10 +45,12 @@ class CustomerGameController extends Controller
 
     public function index(GetGamesRequest $getGamesRequest): Response
     {
+        $filter = $getGamesRequest->filters ?? [];
         $data = $this->gameRepository->list(
-            $getGamesRequest->filters ?? [],
+            $filter,
             $getGamesRequest->sort ?? 'es_index',
             $getGamesRequest->sort_direction ?? 'desc',
+            $getGamesRequest->page ?? null
         );
 
         return new Response($data);
@@ -81,6 +84,10 @@ class CustomerGameController extends Controller
 
     public function gameStatsForUser(int $id, int $userId, Request $request): Response
     {
+        if (data_get($request, 'user.id') !== $userId) {
+            throw new HttpException(422);
+        }
+
         $game = $this->gameRepository->get($id);
 
         return new Response([
@@ -130,6 +137,10 @@ class CustomerGameController extends Controller
 
     public function addToFavourites(int $id, Request $request): Response
     {
+        if (data_get($request, 'user.id') !== $request->user_id) {
+            throw new HttpException(422);
+        }
+
         $game = $this->addGameToFavouritesUseCase->handle($id, $request->user_id);
 
         return new Response($game);
@@ -137,6 +148,10 @@ class CustomerGameController extends Controller
 
     public function removeFromFavourites(int $id, Request $request): Response
     {
+        if (data_get($request, 'user.id') !== $request->user_id) {
+            throw new HttpException(422);
+        }
+
         $game = $this->removeGameFromFavouritesUseCase->handle($id, $request->user_id);
 
         return new Response($game);
@@ -144,6 +159,10 @@ class CustomerGameController extends Controller
 
     public function rate(int $gameId, Request $request): Response
     {
+        if (data_get($request, 'user.id') !== $request->user_id) {
+            throw new HttpException(422);
+        }
+
         $this->rateGameUseCase->handle($gameId, $request->user_id, $request->rate);
 
         return response()->noContent();
@@ -160,8 +179,10 @@ class CustomerGameController extends Controller
     {
         $versions = $this->gameReleaseRepository->getAvailableVersions($gameId);
 
-        $images = $versions['images'];
-        unset($versions['images']);
+        $images = $versions['images'] ?? [];
+        if (isset($versions['images'])) {
+            unset($versions['images']);
+        }
 
         $result = [];
 
@@ -179,6 +200,10 @@ class CustomerGameController extends Controller
 
     public function remove(int $id, Request $request): Response
     {
+        if (data_get($request, 'user.id') !== $request->user_id) {
+            throw new HttpException(422);
+        }
+
         $this->removeGameUseCase->handle($id, $request->user_id);
 
         return response()->noContent();
@@ -186,7 +211,7 @@ class CustomerGameController extends Controller
 
     private function getGameState(Game $game, int $userId, string $os): string
     {
-        $lastVersion = $game->gameReleases?->last()->version;
+        $lastVersion = $game->gameReleases?->last()?->version;
 
         return $this->customerGameRepository->exists([
             'game_id' => $game->id,

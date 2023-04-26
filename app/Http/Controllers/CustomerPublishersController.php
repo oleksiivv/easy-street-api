@@ -80,13 +80,46 @@ class CustomerPublishersController extends Controller
         collect($this->userSubscriptionsRepository->list([
             'user_id' => $userId,
         ]))->transform(function ($item) use (&$games) {
+            $item['publisher']['games'] = $item['publisher']['games']?->map(function ($game) {
+                return $game->load('gamePage');
+            });
+
             $games = array_merge($games, $item['publisher']['games']?->toArray() ?? []);
         });
+
+        $recomendations = $this->gameRepository->list([
+            'status' => "[\"active\"]",
+        ]);
+
+        $recomendationsFrom = rand(min($recomendations->count() - 5, 0), $recomendations->count()-2);
+
+        $recomendations = $recomendations->slice($recomendationsFrom, min($recomendations->count(), $recomendationsFrom + rand(5, 15)));
+
+        $games = array_slice(array_merge($games, $recomendations->toArray()['data'] ?? []), 0, 9);
 
         return new Response([
             'subscriptions' => $this->userSubscriptionsRepository->list([
                 'user_id' => $userId,
             ]),
+            'games' => $games,
+        ]);
+    }
+
+    public function recomendations(Request $request)
+    {
+        $games = [];
+
+        $recomendations = $this->gameRepository->list([
+            'status' => "[\"active\"]",
+        ]);
+
+        $recomendationsFrom = rand(max($recomendations->count() - 5, 0), $recomendations->count()-2);
+
+        $recomendations = $recomendations->slice($recomendationsFrom, min($recomendations->count(), $recomendationsFrom + rand(5, 15)));
+
+        $games = array_slice(array_merge($games, $recomendations->toArray()['data'] ?? []), 0, 9);
+
+        return new Response([
             'games' => $games,
         ]);
     }

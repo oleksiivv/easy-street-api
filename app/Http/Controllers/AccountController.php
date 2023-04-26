@@ -17,6 +17,7 @@ use App\UseCases\UpdateUserUseCase;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AccountController extends Controller
 {
@@ -60,6 +61,10 @@ class AccountController extends Controller
 
     public function update(int $id, CustomerUpdateRequest $customerUpdateRequest, UpdateUserUseCase $updateUserUseCase): Response
     {
+        if (data_get($customerUpdateRequest, 'user.id') !== $id) {
+            throw new HttpException(422);
+        }
+
         return new Response($updateUserUseCase->handle($id, $customerUpdateRequest->all()));
     }
 

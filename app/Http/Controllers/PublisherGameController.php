@@ -21,9 +21,11 @@ use App\Repositories\GameRepository;
 use App\Repositories\LikesRepository;
 use App\Repositories\System\FileRepository;
 use App\Repositories\UserSubscriptionsRepository;
+use App\Services\GameAccessService;
 use App\System\OperatingSystem;
 use App\UseCases\CreateGameUseCase;
 use App\UseCases\UpdateGameUseCase;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -40,6 +42,7 @@ class PublisherGameController extends Controller
         private UserSubscriptionsRepository $userSubscriptionsRepository,
         private GameCategoryRepository $gameCategoryRepository,
         private GameActionRepository $gameActionRepository,
+        private GameAccessService $gameAccessService,
     ) {
     }
 
@@ -50,15 +53,23 @@ class PublisherGameController extends Controller
         return new Response($data);
     }
 
-    public function getGame(int $id): Response
+    public function getGame(int $id, Request $request): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $id)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->gameRepository->get($id);
 
         return new Response($game);
     }
 
-    public function gameStats(int $id): Response
+    public function gameStats(int $id, Request $request): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $id)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->gameRepository->get($id);
 
         return new Response([
@@ -101,8 +112,12 @@ class PublisherGameController extends Controller
         return new Response($game);
     }
 
-    public function releaseGame(int $gameId): Response
+    public function releaseGame(int $gameId, Request $request): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->gameRepository->get($gameId);
 
         if (!$game->approved) {
@@ -125,6 +140,10 @@ class PublisherGameController extends Controller
 
     public function updateGame(int $gameId, UpdateGameRequest $updateGameRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGameRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->updateGameUseCase->handle($gameId, $updateGameRequest->getGameDTO());
 
         $this->gameActionRepository->create([
@@ -139,6 +158,10 @@ class PublisherGameController extends Controller
 
     public function updateGameRelease(int $gameId, UpdateGameReleaseRequest $updateGameReleaseRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGameReleaseRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->updateGameUseCase->handle($gameId, $updateGameReleaseRequest->getGameDTO());
 
         $this->gameActionRepository->create([
@@ -153,6 +176,10 @@ class PublisherGameController extends Controller
 
     public function updateGameReleaseFiles(int $gameId, UpdateGameReleaseFilesRequest $updateGameReleaseFilesRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGameReleaseFilesRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->gameRepository->get($gameId);
 
         Log::info(json_encode($updateGameReleaseFilesRequest->all(), JSON_PRETTY_PRINT));
@@ -182,6 +209,10 @@ class PublisherGameController extends Controller
 
     public function updateGamePage(int $gameId, UpdateGamePageRequest $updateGamePageRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGamePageRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->updateGameUseCase->handle($gameId, $updateGamePageRequest->getGameDTO());
 
         $this->gameActionRepository->create([
@@ -196,6 +227,10 @@ class PublisherGameController extends Controller
 
     public function updateGameLinks(int $gameId, UpdateGameLinksRequest $updateGameLinksRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGameLinksRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->updateGameUseCase->handle($gameId, $updateGameLinksRequest->getGameDTO());
 
         $this->gameActionRepository->create([
@@ -210,6 +245,10 @@ class PublisherGameController extends Controller
 
     public function updateGameProduct(int $gameId, UpdateGamePaidProductRequest $updateGamePaidProductRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGamePaidProductRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->updateGameUseCase->handle($gameId, $updateGamePaidProductRequest->getGameDTO());
 
         $this->gameActionRepository->create([
@@ -224,6 +263,10 @@ class PublisherGameController extends Controller
 
     public function updateGameSecurity(int $gameId, UpdateGameSecurityRequest $updateGameSecurityRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGameSecurityRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->updateGameUseCase->handle($gameId, $updateGameSecurityRequest->getGameDTO());
 
         $this->gameActionRepository->create([
@@ -238,6 +281,10 @@ class PublisherGameController extends Controller
 
     public function updateGameCategory(int $gameId, UpdateGameCategoryRequest $updateGameCategoryRequest): Response
     {
+        if ($this->gameAccessService->noAccess(data_get($updateGameCategoryRequest, 'user.id'), $gameId)) {
+            throw new HttpException(422);
+        }
+
         $game = $this->updateGameUseCase->handle($gameId, $updateGameCategoryRequest->getGameDTO());
 
         $this->gameActionRepository->create([

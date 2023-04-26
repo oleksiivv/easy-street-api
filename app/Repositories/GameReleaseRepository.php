@@ -32,7 +32,11 @@ class GameReleaseRepository
 
     public function getAvailableVersions(int $gameId): array
     {
-        $release = Game::findOrFail($gameId)->gameReleases->last();
+        $release = Game::findOrFail($gameId)->gameReleases?->last();
+
+        if (!$release) {
+            return [];
+        }
 
         return array_filter([
             'android_file_url' => $release->android_file_url,

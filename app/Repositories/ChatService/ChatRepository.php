@@ -19,6 +19,11 @@ class ChatRepository
         ])->first();
     }
 
+    public function getActive(): Collection
+    {
+        return Chat::withCount('messages')->whereHas('messages')->orderBy('messages_count', 'desc')->take(5)->get()->load('game', 'game.gamePage');
+    }
+
     public function getByUserId(int $userId): Collection
     {
         return Chat::query()->whereHas('messages', function ($query) use ($userId) {
