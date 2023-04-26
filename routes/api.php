@@ -123,7 +123,7 @@ Route::group(['prefix' => '/my-account'], function () {
     Route::post('/try-login-via-cache', [AccountController::class, 'tryLoginViaCache']);
 
     Route::post('/register', [AccountController::class, 'register']);
-    Route::get('/confirm-email/{email}/{emailConfirmationToken}', [AccountController::class, 'confirmEmail'])->middleware('customer-access');
+    Route::get('/confirm-email/{email}/{emailConfirmationToken}', [AccountController::class, 'confirmEmail']);//->middleware('customer-access');
 
     Route::put('/{id}/update', [AccountController::class, 'update'])->middleware('customer-access');
 
