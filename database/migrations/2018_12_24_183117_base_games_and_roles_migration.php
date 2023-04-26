@@ -99,11 +99,11 @@ return new class extends Migration
 
         Schema::create('game_pages', function (Blueprint $table) {
             $table->id();
-            $table->string('short_description');
-            $table->string('long_description');
-            $table->string('icon_url');
-            $table->string('background_image_url');
-            $table->json('description_images');
+            $table->string('short_description')->nullable();
+            $table->string('long_description')->nullable();
+            $table->string('icon_url')->nullable();
+            $table->string('background_image_url')->nullable();
+            $table->json('description_images')->nullable();
 
             $table->unsignedBigInteger('game_id');
 
