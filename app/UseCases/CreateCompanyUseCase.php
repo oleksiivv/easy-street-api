@@ -73,7 +73,7 @@ class CreateCompanyUseCase
             $this->userRepository->updateRole($company->publisher->id, Role::ROLE_PUBLISHER);
 
             $this->mailService->sendCompanyCreatedConfirmation($company->publisher->email, [
-                'name' => $company->publisher->name,
+                'name' => $company->publisher->first_name . ' ' . $company->publisher->first_name,
                 'companyName' => $company->name,
             ], 'Company creating confirmation');
 

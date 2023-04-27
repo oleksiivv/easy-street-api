@@ -16,7 +16,7 @@ class UpdateGameRequest extends FormRequest
     public function rules()
     {
         return [
-            'status' => 'nullable|string|in:' . join('", "', Game::STATUSES_AVAILABLE_FOR_MODERATOR),
+            'status' => 'nullable|string',
             'approve' => 'required|boolean',
 
             'game_security' => 'nullable|array',

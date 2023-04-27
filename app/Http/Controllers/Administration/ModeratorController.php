@@ -48,9 +48,10 @@ class ModeratorController extends Controller
 
         $message = $request->attached_message ?? "No message attached";
 
-        if ($game->approved) {
+        if ($request->getGameDTO()->approved) {
             $this->mailService->sendGameApproveEmail($company->publisher->email, [
                 'gameName' => $game->name,
+                'companyName' => $game->publisher->name,
                 'gameId' => $gameId,
                 'attachedMessage' => $message,
             ], 'Game Status Updates');
