@@ -78,7 +78,7 @@ class GameRepository
         }
 
         $result = collect([]);
-        $result['data'] = $games;
+        $result['data'] = $games->unique();
         $result['pagination'] = [
             'page' => $page,
             'pages' => ceil($gamesCount / self::GAME_PAGINATION_PER_PAGE),
