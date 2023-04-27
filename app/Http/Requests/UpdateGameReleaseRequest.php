@@ -15,7 +15,6 @@ class UpdateGameReleaseRequest extends FormRequest
     {
         return [
             'version' => 'required|string',
-            'release_date' => 'required|string',
         ];
     }
 

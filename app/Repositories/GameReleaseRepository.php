@@ -19,7 +19,9 @@ class GameReleaseRepository
     public function update(GameReleaseDTO $data): GameRelease
     {
         try {
-            $gameRelease = GameRelease::where('version', $data->version)->firstOrFail();
+            $gameRelease = GameRelease::whereHas('game', function ($query) use ($data) {
+                return $query->where('id', $data->game_id);
+            })->where('version', $data->version)->firstOrFail();
             $gameRelease->update(array_filter($data->toArray()));
 
             $gameRelease->save();

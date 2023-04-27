@@ -19,7 +19,6 @@ class GameRelease extends Model
         'windows_file_url',
         'mac_file_url',
         'linux_file_url',
-        'release_date',
         'game_id',
 
         'android_icon',

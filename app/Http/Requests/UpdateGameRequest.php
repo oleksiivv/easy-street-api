@@ -37,7 +37,6 @@ class UpdateGameRequest extends FormRequest
             'game_release.windows_file_url' => 'nullable|string',
             'game_release.mac_file_url' => 'nullable|string',
             'game_release.linux_file_url' => 'nullable|string',
-            'game_release.release_date' => 'nullable|string',
 
             'game_security' => 'nullable|array',
             'game_security.has_ads' => 'nullable|boolean',

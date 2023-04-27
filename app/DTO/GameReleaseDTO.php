@@ -18,7 +18,5 @@ class GameReleaseDTO extends DataTransferObject
 
     public ?string $linux_file_url;
 
-    public ?string $release_date;
-
     public ?int $game_id;
 }
