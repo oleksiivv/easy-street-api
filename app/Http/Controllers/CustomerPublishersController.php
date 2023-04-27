@@ -101,7 +101,7 @@ class CustomerPublishersController extends Controller
             'subscriptions' => $this->userSubscriptionsRepository->list([
                 'user_id' => $userId,
             ]),
-            'games' => $games,
+            'games' => array_unique($games),
         ]);
     }
 
