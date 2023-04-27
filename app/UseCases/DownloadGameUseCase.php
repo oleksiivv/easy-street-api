@@ -42,7 +42,7 @@ class DownloadGameUseCase
 
         $game->es_index = $game->es_index + 30;
 
-        if ($game->paidProduct->price > 0 && ! $alreadyDownloaded) {
+        if ($game->paidProduct?->price > 0 && ! $alreadyDownloaded) {
             if (! $this->proceedPayment($customerId, $paymentData, $game->paidProduct->price, $game)) {
                 throw new HttpException(422, 'Invalid payment data');
             }
