@@ -84,7 +84,10 @@ class CustomerPublishersController extends Controller
                 return $game->load('gamePage');
             });
 
-            $games = array_merge($games, $item['publisher']['games']?->toArray() ?? []);
+            $games = array_unique(
+                array_merge($games, $item['publisher']['games']?->toArray() ?? []),
+                SORT_REGULAR
+            );
         });
 
         $recomendations = $this->gameRepository->list([
@@ -95,7 +98,10 @@ class CustomerPublishersController extends Controller
 
         $recomendations = $recomendations->slice($recomendationsFrom, min($recomendations->count(), $recomendationsFrom + rand(5, 15)));
 
-        $games = array_slice(array_diff(array_merge($games, $recomendations->toArray()['data'] ?? []), array_intersect($games, $recomendations->toArray()['data'] ?? [])), 0, 9);
+        $games = array_unique(
+            array_slice(array_merge($games, $recomendations->toArray()['data'] ?? []), 0, 9),
+            SORT_REGULAR
+        );
 
         return new Response([
             'subscriptions' => $this->userSubscriptionsRepository->list([
