@@ -120,7 +120,7 @@ class CustomerPublishersController extends Controller
         $games = array_slice(array_merge($games, $recomendations->toArray()['data'] ?? []), 0, 9);
 
         return new Response([
-            'games' => array_unique($games),
+            'games' => array_unique(array_values($games)),
         ]);
     }
 
