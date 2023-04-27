@@ -77,19 +77,6 @@ class CustomerPublishersController extends Controller
     {
         $games = [];
 
-        collect($this->userSubscriptionsRepository->list([
-            'user_id' => $userId,
-        ]))->transform(function ($item) use (&$games) {
-            $item['publisher']['games'] = $item['publisher']['games']?->map(function ($game) {
-                return $game->load('gamePage');
-            });
-
-            $games = array_unique(
-                array_merge($games, $item['publisher']['games']?->toArray() ?? []),
-                SORT_REGULAR
-            );
-        });
-
         $recomendations = $this->gameRepository->list([
             'status' => "[\"active\"]",
         ]);
@@ -98,10 +85,17 @@ class CustomerPublishersController extends Controller
 
         $recomendations = $recomendations->slice($recomendationsFrom, min($recomendations->count(), $recomendationsFrom + rand(5, 15)));
 
-        $games = array_unique(
-            array_slice(array_merge($games, $recomendations->toArray()['data'] ?? []), 0, 9),
-            SORT_REGULAR
-        );
+        collect($this->userSubscriptionsRepository->list([
+            'user_id' => $userId,
+        ]))->transform(function ($item) use (&$games, $recomendations) {
+            $item['publisher']['games'] = $item['publisher']['games']?->map(function ($game) use ($recomendations) {
+                return in_array($game, $recomendations->toArray()) ? $game->load('gamePage') : null;
+            });
+
+            $games = array_merge($games, array_filter($item['publisher']['games']?->toArray() ?? []));
+        });
+
+        $games = array_slice(array_merge($games, $recomendations->toArray()['data'] ?? []), 0, 9);
 
         return new Response([
             'subscriptions' => $this->userSubscriptionsRepository->list([
