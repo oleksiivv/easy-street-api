@@ -95,7 +95,7 @@ class CustomerPublishersController extends Controller
 
         $recomendations = $recomendations->slice($recomendationsFrom, min($recomendations->count(), $recomendationsFrom + rand(5, 15)));
 
-        $games = array_slice(array_unique(array_merge($games, $recomendations->toArray()['data'] ?? []), SORT_REGULAR), 0, 9);
+        $games = array_slice(array_diff(array_merge($games, $recomendations->toArray()['data'] ?? []), array_intersect($games, $recomendations->toArray()['data'] ?? [])), 0, 9);
 
         return new Response([
             'subscriptions' => $this->userSubscriptionsRepository->list([
