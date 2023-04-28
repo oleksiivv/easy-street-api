@@ -89,7 +89,9 @@ class CustomerPublishersController extends Controller
             'user_id' => $userId,
         ]))->transform(function ($item) use (&$games, $recomendations) {
             $item['publisher']['games'] = $item['publisher']['games']?->map(function ($game) use ($recomendations) {
-                return in_array($game, $recomendations->toArray()['data'] ?? []) ? $game->load('gamePage') : null;
+                return in_array($game, $recomendations->toArray()['data'] ?? []) || empty($recomendations->toArray()['data'])
+                    ? $game->load('gamePage')
+                    : null;
             });
 
             $games = array_merge($games, array_filter($item['publisher']['games']?->toArray() ?? []));
