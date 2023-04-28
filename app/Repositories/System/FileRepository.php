@@ -34,7 +34,6 @@ class FileRepository
             ? sprintf(OperatingSystem::EXECUTABLE_FILES_PATH, $game->id, $file->getClientOriginalName())
             : sprintf(OperatingSystem::PAGE_FILES_PATH, $game->id, $pageFilePrefix);
 
-        dd($destinationPath);
         Storage::disk(env('STORAGE'))->put($destinationPath . '/' . $file->getClientOriginalName(), $file->getContent(), 'public');
 
         $path = Storage::disk(env('STORAGE'))->url($destinationPath . '/' . $file->getClientOriginalName());

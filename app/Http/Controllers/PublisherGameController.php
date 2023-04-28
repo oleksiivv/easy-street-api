@@ -228,7 +228,6 @@ class PublisherGameController extends Controller
 
         Log::info(json_encode($updateGameReleaseFilesRequest->all(), JSON_PRETTY_PRINT));
 
-        dd($updateGameReleaseFilesRequest->windows_file_url);
         if (isset($updateGameReleaseFilesRequest->android_file_url)) {
             $this->fileRepository->uploadFile($game, $updateGameReleaseFilesRequest->android_file_url, true, OperatingSystem::ANDROID, FileRepository::FILE_TYPE_RELEASE);
         }
