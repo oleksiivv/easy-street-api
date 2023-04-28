@@ -18,10 +18,10 @@ class FileUploadUseCase
     {
         $game = $gameRepository->get($this->gameId);
 
-        $fileData = $fileRepository->uploadFile($game, $this->file, false, $this->pageFilePrefix, $this->fileType);
+        $fileRepository->uploadFile($game, $this->file, false, $this->pageFilePrefix, $this->fileType);
 
         //TODO: associate file with game
 
-        event(new FileUploadedEvent($fileData));
+        //event(new FileUploadedEvent($fileData));
     }
 }
