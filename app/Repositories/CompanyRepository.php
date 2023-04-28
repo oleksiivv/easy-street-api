@@ -11,7 +11,7 @@ class CompanyRepository
 {
     public function get(int $id): Company
     {
-        return Company::findOrFail($id)->load('games');
+        return Company::findOrFail($id)->load('games', 'games.gamePage');
     }
 
     public function list(array $filter = [], string $sort = 'id', string $direction = Company::COMPANY_SORT_DIRECTION_ASC): Collection
