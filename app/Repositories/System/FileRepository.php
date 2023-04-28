@@ -30,12 +30,6 @@ class FileRepository
 
     public function uploadFile(Game $game, UploadedFile $file, bool $appFile, string $pageFilePrefix, string $fileType)
     {
-        $data = [
-            'name' => $file->getClientOriginalName(),
-            'file_extension' => $file->getClientOriginalExtension(),
-            'original_path' => $file->getRealPath(),
-        ];
-
         $destinationPath = $appFile
             ? sprintf(OperatingSystem::EXECUTABLE_FILES_PATH, $game->id, $file->getClientOriginalName())
             : sprintf(OperatingSystem::PAGE_FILES_PATH, $game->id, $pageFilePrefix);
@@ -43,8 +37,6 @@ class FileRepository
         Storage::disk(env('STORAGE'))->put($destinationPath . '/' . $file->getClientOriginalName(), $file->getContent(), 'public');
 
         $path = Storage::disk(env('STORAGE'))->url($destinationPath . '/' . $file->getClientOriginalName());
-
-        $data['path'] = $path;
 
          if ($fileType === self::FILE_TYPE_DESCRIPTION_IMAGE) {
             $descriptionImages = $game->gamePage->description_images;
@@ -62,7 +54,5 @@ class FileRepository
                  $pageFilePrefix => $path,
              ]);
          }
-
-        return $data;
     }
 }
