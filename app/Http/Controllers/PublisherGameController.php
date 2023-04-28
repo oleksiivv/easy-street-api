@@ -211,7 +211,7 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = 'update_in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
         $game->save();
         $game->refresh();
 
@@ -251,7 +251,7 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = 'update_in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
         $game->save();
         $game->refresh();
 
@@ -273,7 +273,7 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = 'update_in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
         $game->save();
         $game->refresh();
 
@@ -295,7 +295,7 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = 'update_in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
         $game->save();
         $game->refresh();
 
@@ -317,7 +317,7 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = 'update_in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
         $game->save();
         $game->refresh();
 
@@ -339,7 +339,7 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = 'update_in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
         $game->save();
         $game->refresh();
 
@@ -361,7 +361,7 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = 'update_in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
         $game->save();
         $game->refresh();
 
