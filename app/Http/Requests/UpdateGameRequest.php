@@ -17,8 +17,8 @@ class UpdateGameRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string',
-            'genre' => 'nullable|in:' . join(',', Game::GENRES),
-            'status' => 'required|string|in:' . join(',', Game::STATUSES_AVAILABLE_FOR_PUBLISHER),
+            'genre' => 'nullable',
+            'status' => 'nullable|string',
             'tags' => 'nullable|array',
             'site' => 'nullable|string',
             'game_category_id' => 'nullable|int',

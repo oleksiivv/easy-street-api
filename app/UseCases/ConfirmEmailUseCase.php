@@ -27,6 +27,7 @@ class ConfirmEmailUseCase
 
             Assert::same($user->email, $email);
 
+            $this->managementTokenRepository->removeUser();
             $this->managementTokenRepository->storeUser($user);
         } catch (Throwable) {
             throw new HttpException(Response::HTTP_UNAUTHORIZED);

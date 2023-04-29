@@ -32,7 +32,9 @@ class GamePageRepository
     {
         try {
             $gamePage = GamePage::find($id);
-            $gamePage->update(array_filter($data));
+            $gamePage->update(array_filter($data, function ($item) {
+                return $item !== null;
+            }));
 
             $gamePage->save();
         } catch (Throwable) {

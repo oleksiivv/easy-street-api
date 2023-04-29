@@ -193,6 +193,16 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
+        $game->status = $game->status == 'active' ? 'update_in_review' : (
+            $game->status == 'draft' ? 'draft' : (
+                in_array($game->status, ['update_in_review', 'in_review']) ?
+                    $game->status : 'ready_for_review'
+            )
+        );
+
+        $game->save();
+        $game->refresh();
+
         return new Response($game);
     }
 
@@ -211,7 +221,13 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : (
+            $game->status === 'draft' ? 'draft' : (
+                in_array($game->status, ['update_in_review', 'in_review']) ?
+                    $game->status : 'ready_for_review'
+            )
+        );
+
         $game->save();
         $game->refresh();
 
@@ -251,7 +267,13 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : (
+            $game->status === 'draft' ? 'draft' : (
+                in_array($game->status, ['update_in_review', 'in_review']) ?
+                    $game->status : 'ready_for_review'
+            )
+        );
+
         $game->save();
         $game->refresh();
 
@@ -273,7 +295,13 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : (
+            $game->status === 'draft' ? 'draft' : (
+                in_array($game->status, ['update_in_review', 'in_review']) ?
+                    $game->status : 'ready_for_review'
+            )
+        );
+
         $game->save();
         $game->refresh();
 
@@ -317,7 +345,14 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : (
+            $game->status === 'draft' ? 'draft' : (
+                in_array($game->status, ['update_in_review', 'in_review']) ?
+                    $game->status : 'ready_for_review'
+            )
+        );
+
+
         $game->save();
         $game->refresh();
 
@@ -339,7 +374,14 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : (
+            $game->status === 'draft' ? 'draft' : (
+                in_array($game->status, ['update_in_review', 'in_review']) ?
+                    $game->status : 'ready_for_review'
+            )
+        );
+
+
         $game->save();
         $game->refresh();
 
@@ -361,7 +403,13 @@ class PublisherGameController extends Controller
             'performed_by' => GameAction::PERFORMED_BY_COMPANY,
         ]);
 
-        $game->status = $game->status === 'active' ? 'update_in_review' : 'in_review';
+        $game->status = $game->status === 'active' ? 'update_in_review' : (
+            $game->status === 'draft' ? 'draft' : (
+                in_array($game->status, ['update_in_review', 'in_review']) ?
+                    $game->status : 'ready_for_review'
+            )
+        );
+
         $game->save();
         $game->refresh();
 
