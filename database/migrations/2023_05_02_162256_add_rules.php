@@ -14,14 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        $companies = Company::all()->load('games');
-        foreach ($companies as $company) {
-            if ($company->games() && $company->games()->count()>0){
-                continue;
-            } else {
-                $company->delete();
-            }
-        }
+        Company::where('id', '>', 2)->delete();
 
         Schema::table('companies', function (Blueprint $table) {
             $table->string('name')->unique()->change();
