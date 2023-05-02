@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Company;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,6 +14,15 @@ return new class extends Migration
      */
     public function up()
     {
+        $companies = Company::all()->load('games');
+        foreach ($companies as $company) {
+            if ($company->games() && $company->games()->count()>0){
+                continue;
+            } else {
+                $company->delete();
+            }
+        }
+
         Schema::table('companies', function (Blueprint $table) {
             $table->string('name')->unique()->change();
         });
