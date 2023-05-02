@@ -19,11 +19,11 @@ class PublisherAccessMiddleware
     {
         $data = $this->managementTokenRepository->get('current_user');
         if (!in_array(data_get($data, 'role'),  [Role::ROLE_PUBLISHER, Role::ROLE_PUBLISHER_TEAM_MEMBER])) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         if (!data_get($data, 'user.email_is_confirmed', false)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $request->merge(['user' => $data['user']]);

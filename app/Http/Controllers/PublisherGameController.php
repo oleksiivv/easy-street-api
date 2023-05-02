@@ -56,7 +56,7 @@ class PublisherGameController extends Controller
     public function getGame(int $id, Request $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $id)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->gameRepository->get($id);
@@ -67,7 +67,7 @@ class PublisherGameController extends Controller
     public function gameStats(int $id, Request $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $id)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->gameRepository->get($id);
@@ -115,7 +115,7 @@ class PublisherGameController extends Controller
     public function releaseGame(int $gameId, Request $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->gameRepository->get($gameId);
@@ -141,7 +141,7 @@ class PublisherGameController extends Controller
     public function releaseGameAsDemo(int $gameId, Request $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->gameRepository->updateByArray($gameId, [
@@ -161,7 +161,7 @@ class PublisherGameController extends Controller
     public function makeDraft(int $gameId, Request $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->gameRepository->updateByArray($gameId, [
@@ -181,7 +181,7 @@ class PublisherGameController extends Controller
     public function updateGame(int $gameId, UpdateGameRequest $updateGameRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGameRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->updateGameUseCase->handle($gameId, $updateGameRequest->getGameDTO());
@@ -209,7 +209,7 @@ class PublisherGameController extends Controller
     public function updateGameRelease(int $gameId, UpdateGameReleaseRequest $updateGameReleaseRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGameReleaseRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->updateGameUseCase->handle($gameId, $updateGameReleaseRequest->getGameDTO());
@@ -237,7 +237,7 @@ class PublisherGameController extends Controller
     public function updateGameReleaseFiles(int $gameId, UpdateGameReleaseFilesRequest $updateGameReleaseFilesRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGameReleaseFilesRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->gameRepository->get($gameId);
@@ -283,7 +283,7 @@ class PublisherGameController extends Controller
     public function updateGamePage(int $gameId, UpdateGamePageRequest $updateGamePageRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGamePageRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->updateGameUseCase->handle($gameId, $updateGamePageRequest->getGameDTO());
@@ -311,7 +311,7 @@ class PublisherGameController extends Controller
     public function updateGameLinks(int $gameId, UpdateGameLinksRequest $updateGameLinksRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGameLinksRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->updateGameUseCase->handle($gameId, $updateGameLinksRequest->getGameDTO());
@@ -333,7 +333,7 @@ class PublisherGameController extends Controller
     public function updateGameProduct(int $gameId, UpdateGamePaidProductRequest $updateGamePaidProductRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGamePaidProductRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->updateGameUseCase->handle($gameId, $updateGamePaidProductRequest->getGameDTO());
@@ -362,7 +362,7 @@ class PublisherGameController extends Controller
     public function updateGameSecurity(int $gameId, UpdateGameSecurityRequest $updateGameSecurityRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGameSecurityRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->updateGameUseCase->handle($gameId, $updateGameSecurityRequest->getGameDTO());
@@ -391,7 +391,7 @@ class PublisherGameController extends Controller
     public function updateGameCategory(int $gameId, UpdateGameCategoryRequest $updateGameCategoryRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($updateGameCategoryRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->updateGameUseCase->handle($gameId, $updateGameCategoryRequest->getGameDTO());

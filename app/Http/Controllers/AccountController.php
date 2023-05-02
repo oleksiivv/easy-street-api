@@ -43,7 +43,7 @@ class AccountController extends Controller
         Log::info(json_encode($data, JSON_PRETTY_PRINT));
 
         if (data_get($data, 'user') === null) {
-            throw new UnauthorizedException('Unauthorized', 422);
+            throw new UnauthorizedException('Unauthorized', 401);
         }
 
         return new Response($data['user']);
@@ -62,7 +62,7 @@ class AccountController extends Controller
     public function update(int $id, CustomerUpdateRequest $customerUpdateRequest, UpdateUserUseCase $updateUserUseCase): Response
     {
         if (data_get($customerUpdateRequest, 'user.id') !== $id) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         return new Response($updateUserUseCase->handle($id, $customerUpdateRequest->all()));

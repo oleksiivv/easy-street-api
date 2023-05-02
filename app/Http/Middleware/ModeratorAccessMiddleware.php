@@ -19,11 +19,11 @@ class ModeratorAccessMiddleware
     {
         $data = $this->managementTokenRepository->get('current_user');
         if (! in_array(data_get($data, 'role'), [Role::ROLE_ADMIN, Role::ROLE_MODERATOR])) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         if (!data_get($data, 'user.email_is_confirmed', false)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         return $next($request);

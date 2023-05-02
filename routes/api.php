@@ -133,12 +133,12 @@ Route::group(['prefix' => '/my-account'], function () {
     Route::get('/confirm-new-password/{email}/{newPasswordSha}/{confirmNewPasswordToken}', [AccountController::class, 'confirmNewPassword']);
 
     Route::group(['prefix' => '/{id}/card'], function (){
-        Route::get('/', [AccountPaymentCardController::class, 'index']);
-        Route::get('/default', [AccountPaymentCardController::class, 'getDefault']);
-        Route::post('/', [AccountPaymentCardController::class, 'add']);
-        Route::put('/{cardId}/make-default', [AccountPaymentCardController::class, 'makeDefault']);
-        Route::delete('/all', [AccountPaymentCardController::class, 'deleteAll']);
-        Route::delete('/{cardId}', [AccountPaymentCardController::class, 'delete']);
+        Route::get('/', [AccountPaymentCardController::class, 'index'])->middleware('customer-access');
+        Route::get('/default', [AccountPaymentCardController::class, 'getDefault'])->middleware('customer-access');
+        Route::post('/', [AccountPaymentCardController::class, 'add'])->middleware('customer-access');
+        Route::put('/{cardId}/make-default', [AccountPaymentCardController::class, 'makeDefault'])->middleware('customer-access');
+        Route::delete('/all', [AccountPaymentCardController::class, 'deleteAll'])->middleware('customer-access');
+        Route::delete('/{cardId}', [AccountPaymentCardController::class, 'delete'])->middleware('customer-access');
     });
     Route::get('/billing-portal', function (Request $request) {
         return $request->user()->redirectToBillingPortal();

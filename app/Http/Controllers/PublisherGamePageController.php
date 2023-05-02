@@ -24,7 +24,7 @@ class PublisherGamePageController extends Controller
     public function uploadIcon(int $gameId, UploadIconRequest $uploadIconRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($uploadIconRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $gamePage = $this->gameRepository->get($gameId)?->gamePage;
@@ -41,7 +41,7 @@ class PublisherGamePageController extends Controller
     public function uploadBackground(int $gameId, UploadBackgroundImageRequest $uploadBackgroundImageRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($uploadBackgroundImageRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $gamePage = $this->gameRepository->get($gameId)?->gamePage;
@@ -57,7 +57,7 @@ class PublisherGamePageController extends Controller
     public function uploadDescriptionImages(int $gameId, UploadDescriptionImagesRequest $uploadDescriptionImagesRequest): Response
     {
         if ($this->gameAccessService->noAccess(data_get($uploadDescriptionImagesRequest, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $gamePage = $this->gameRepository->get($gameId)?->gamePage;

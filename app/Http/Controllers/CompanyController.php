@@ -47,7 +47,7 @@ class CompanyController extends Controller
     public function stats(int $companyId, Request $request): Response
     {
         if ($this->companyAccessService->noAccess(data_get($request, 'user.id'), $companyId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $company = $this->companyRepository->get($companyId);
@@ -67,7 +67,7 @@ class CompanyController extends Controller
     public function subscribers(int $companyId, Request $request)
     {
         if ($this->companyAccessService->noAccess(data_get($request, 'user.id'), $companyId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         return new Response([
@@ -80,7 +80,7 @@ class CompanyController extends Controller
     public function get(int $id, Request $request): Response
     {
         if ($this->companyAccessService->noAccess(data_get($request, 'user.id'), $id)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $company = $this->companyRepository->get($id);
@@ -98,7 +98,7 @@ class CompanyController extends Controller
     public function update(int $id, UpdateCompanyRequest $updateCompanyRequest): Response
     {
         if ($this->companyAccessService->noAccess(data_get($updateCompanyRequest, 'user.id'), $id)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $company = $this->companyRepository->update($id, $updateCompanyRequest->all());
@@ -109,7 +109,7 @@ class CompanyController extends Controller
     public function getTeam(int $id, Request $request): Response
     {
         if ($this->companyAccessService->noAccess(data_get($request, 'user.id'), $id)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $company = $this->companyRepository->get($id);
@@ -123,7 +123,7 @@ class CompanyController extends Controller
     public function addTeamMember(int $companyId, AddPublisherTeamMemberRequest $request): Response
     {
         if ($this->companyAccessService->noAccess(data_get($request, 'user.id'), $companyId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $company = $this->addPublisherTeamMemberUseCase->handle($companyId, $request->all());
@@ -134,7 +134,7 @@ class CompanyController extends Controller
     public function removeTeamMember(int $companyId, RemovePublisherTeamMemberRequest $request): Response
     {
         if ($this->companyAccessService->noAccess(data_get($request, 'user.id'), $companyId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $company = $this->removePublisherTeamMemberUseCase->handle($companyId, $request->all());

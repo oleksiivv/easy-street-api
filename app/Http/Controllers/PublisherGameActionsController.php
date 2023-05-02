@@ -21,7 +21,7 @@ class PublisherGameActionsController extends Controller
     public function allForCompany(int $companyId, Request $request): Response
     {
         if ($this->companyAccessService->noAccess(data_get($request, 'user.id'), $companyId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
         return new Response($this->gameActionRepository->getAllUsersActions($companyId));
     }
@@ -29,7 +29,7 @@ class PublisherGameActionsController extends Controller
     public function allForGame(int $gameId, Request $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         return new Response($this->gameActionRepository->getAllPublisherActionsForGame($gameId));
@@ -38,7 +38,7 @@ class PublisherGameActionsController extends Controller
     public function allPublisherActionsForGame(int $gameId, Request $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $gameId)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         return new Response($this->gameActionRepository->getAllUsersActionsForGame($gameId));

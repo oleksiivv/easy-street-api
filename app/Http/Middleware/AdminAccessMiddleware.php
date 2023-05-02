@@ -19,7 +19,7 @@ class AdminAccessMiddleware
     {
         $data = $this->managementTokenRepository->get('current_user');
         if (data_get($data, 'role') != Role::ROLE_ADMIN) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         return $next($request);

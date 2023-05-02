@@ -85,7 +85,7 @@ class CustomerGameController extends Controller
     public function gameStatsForUser(int $id, int $userId, Request $request): Response
     {
         if (data_get($request, 'user.id') !== $userId) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->gameRepository->get($id);
@@ -139,7 +139,7 @@ class CustomerGameController extends Controller
     public function addToFavourites(int $id, Request $request): Response
     {
         if (data_get($request, 'user.id') !== $request->user_id) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->addGameToFavouritesUseCase->handle($id, $request->user_id);
@@ -150,7 +150,7 @@ class CustomerGameController extends Controller
     public function removeFromFavourites(int $id, Request $request): Response
     {
         if (data_get($request, 'user.id') !== $request->user_id) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $game = $this->removeGameFromFavouritesUseCase->handle($id, $request->user_id);
@@ -161,7 +161,7 @@ class CustomerGameController extends Controller
     public function rate(int $gameId, Request $request): Response
     {
         if (data_get($request, 'user.id') !== $request->user_id) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $this->rateGameUseCase->handle($gameId, $request->user_id, $request->rate);
@@ -202,7 +202,7 @@ class CustomerGameController extends Controller
     public function remove(int $id, Request $request): Response
     {
         if (data_get($request, 'user.id') !== $request->user_id) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $this->removeGameUseCase->handle($id, $request->user_id);

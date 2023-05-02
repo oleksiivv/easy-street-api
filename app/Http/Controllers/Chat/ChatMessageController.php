@@ -17,7 +17,7 @@ class ChatMessageController extends Controller
     public function sendMessage(int $chatId, SendMessageRequest $sendMessageRequest): void
     {
         if (data_get($sendMessageRequest, 'user.id') !== $sendMessageRequest->user_id) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $this->sendMessageUseCase->handle($chatId, $sendMessageRequest->user_id, $sendMessageRequest->message);

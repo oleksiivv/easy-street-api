@@ -24,7 +24,7 @@ class ChatController extends Controller
     public function create(CreateChatRequest $request): Response
     {
         if ($this->gameAccessService->noAccess(data_get($request, 'user.id'), $request->game_id)) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         return new Response($this->chatRepository->create($request->game_id));
@@ -58,7 +58,7 @@ class ChatController extends Controller
     public function getByUserId(int $userId, Request $request): Response
     {
         if (data_get($request, 'user.id') !== $userId) {
-            throw new HttpException(422);
+            throw new HttpException(401);
         }
 
         $chats = $this->chatRepository->getByUserId($userId)->map(function ($item) {
