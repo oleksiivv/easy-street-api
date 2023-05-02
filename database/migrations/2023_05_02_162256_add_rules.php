@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name')->unique()->change();
         });
 
+        \App\Models\User::where('email_is_confirmed', false)->delete();
+
         Schema::table('users', function (Blueprint $table) {
             $table->string('email')->unique()->change();
         });
