@@ -38,9 +38,9 @@ class AccountController extends Controller
         return response()->noContent();
     }
 
-    public function tryLoginViaCache(Request $request): Response
+    public function tryLoginViaCache(): Response
     {
-        $data = $this->managementTokenRepository->get($request);
+        $data = $this->managementTokenRepository->get();
 
         if (data_get($data, 'user') === null) {
             throw new UnauthorizedException('Unauthorized', 401);
