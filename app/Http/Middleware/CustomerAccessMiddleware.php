@@ -17,7 +17,7 @@ class CustomerAccessMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-        $data = $this->managementTokenRepository->get('current_user');
+        $data = $this->managementTokenRepository->get($request);
         if (data_get($data, 'role') === null) {
             throw new HttpException(401);
         }
