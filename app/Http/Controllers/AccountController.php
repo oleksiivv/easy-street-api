@@ -14,6 +14,7 @@ use App\UseCases\ForgotPasswordUseCase;
 use App\UseCases\LoginUseCase;
 use App\UseCases\RegisterUseCase;
 use App\UseCases\UpdateUserUseCase;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
@@ -37,10 +38,9 @@ class AccountController extends Controller
         return response()->noContent();
     }
 
-    public function tryLoginViaCache(): Response
+    public function tryLoginViaCache(Request $request): Response
     {
-        $data = $this->managementTokenRepository->get('current_user');
-        Log::info(json_encode($data, JSON_PRETTY_PRINT));
+        $data = $this->managementTokenRepository->get($request);
 
         if (data_get($data, 'user') === null) {
             throw new UnauthorizedException('Unauthorized', 401);

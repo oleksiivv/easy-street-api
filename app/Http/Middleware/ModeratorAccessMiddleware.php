@@ -17,7 +17,7 @@ class ModeratorAccessMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-        $data = $this->managementTokenRepository->get('current_user');
+        $data = $this->managementTokenRepository->get($request);
         if (! in_array(data_get($data, 'role'), [Role::ROLE_ADMIN, Role::ROLE_MODERATOR])) {
             throw new HttpException(401);
         }
