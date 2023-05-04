@@ -11,14 +11,14 @@ class ManagementTokenRepository
 {
     public function storeUser(User $user): string
     {
-        $key = 'current_user';
+        $key = $user->password_sha . $user->email . $user->id;
 
         $data = [
             'user' => $user,
             'role' => $user->role->name,
         ];
 
-        Cache::put($key, $data, now()->addMinutes(15));
+        Cache::put($key, $data, now()->addMinutes(60));
         //session([$key => json_encode($data)]);
         //dd(session($key), $key);
         //Cookie::queue($key, json_encode($data), 60);
@@ -26,14 +26,14 @@ class ManagementTokenRepository
         return $key;
     }
 
-    public function removeUser(): void
+    public function removeUser(?string $key): void
     {
         //session_destroy();
-        Cache::delete('current_user');
+        Cache::delete($key);
     }
 
-    public function get(): ?array
+    public function get($key): ?array
     {
-        return Cache::get('current_user');
+        return Cache::get($key);
     }
 }

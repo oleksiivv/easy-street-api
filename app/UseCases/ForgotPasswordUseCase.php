@@ -27,7 +27,7 @@ class ForgotPasswordUseCase
                 'email' => $email,
             ]);
 
-            $this->managementTokenRepository->removeUser();
+            $this->managementTokenRepository->removeUser($user->password_sha . $user->email . $user->id);
 
             $passwordConfirmationToken = Str::uuid()->toString();
 

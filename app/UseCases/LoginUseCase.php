@@ -33,7 +33,8 @@ class LoginUseCase
             $this->managementTokenRepository->storeUser($user);
 
             return $user;
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            throw $e;
             throw new HttpException(Response::HTTP_UNAUTHORIZED);
         }
     }
