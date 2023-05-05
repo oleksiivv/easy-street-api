@@ -44,7 +44,11 @@ class AddPublisherTeamMemberUseCase
                 'companyName' => $company->name,
             ], 'Invitation to the team');
 
-            $user->role_id = $this->roleRepository->findByName(Role::ROLE_PUBLISHER_TEAM_MEMBER)->id;
+            //TODO: fix after diploma
+            if ($user->role->name === Role::ROLE_CUSTOMER) {
+                $user->role_id = $this->roleRepository->findByName(Role::ROLE_PUBLISHER_TEAM_MEMBER)->id;
+            }
+
             $user->save();
 
             return $this->companyRepository->update($companyId, [
