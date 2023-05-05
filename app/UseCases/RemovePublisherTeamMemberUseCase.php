@@ -24,9 +24,11 @@ class RemovePublisherTeamMemberUseCase
 
     public function handle(int $companyId, array $memberSearchCriteria): Company
     {
-        $user = $this->userRepository->findBy($memberSearchCriteria);
-        $user->role_id = $this->roleRepository->findByName(Role::ROLE_CUSTOMER)->id;
-        $user->save();
+        $user = $this->userRepository->findBy([
+            'email' => $memberSearchCriteria['email'],
+        ]);
+        //$user->role_id = $this->roleRepository->findByName(Role::ROLE_CUSTOMER)->id;
+        //$user->save();
 
         $teamMembers = $this->companyRepository->get($companyId)->team_members;
 

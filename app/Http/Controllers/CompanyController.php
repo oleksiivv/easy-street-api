@@ -141,4 +141,16 @@ class CompanyController extends Controller
 
         return new Response($company);
     }
+
+    public function companiesByTeamMember(Request $request, int $userId): Response
+    {
+        if (data_get($request, 'user.id') !== $userId)
+        {
+            throw new HttpException(401, 'Unauthorized');
+        }
+
+        $companies = $this->companyRepository->companiesByTeamMemberUserId($userId);
+
+        return new Response($companies);
+    }
 }
