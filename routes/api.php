@@ -199,6 +199,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin-access'], function ()
 
         Route::group(['prefix' => '/moderators'], function () {
             Route::post('/', [\App\Http\Controllers\Administration\AdministratorController::class, 'createModerator']);
+            Route::delete('/', [\App\Http\Controllers\Administration\AdministratorController::class, 'removeModerator']);
         });
     });
 });
