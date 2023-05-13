@@ -17,7 +17,7 @@ class Game extends Model
 
     public const GAME_SORT_DIRECTION_DESC = 'DESC';
 
-    public const GENRES = ['arcade', 'hyper-casual', 'strategy', 'quiz', 'racing', 'victory', 'adventure'];
+    public const GENRES = ['arcade', 'hyper-casual', 'strategy', 'quiz', 'racing', 'victory', 'adventure', 'other'];
 
     public const STATUSES = ['draft', 'alpha_test', 'in_review', 'demo', 'active', 'ready_for_review', 'update_required', 'cancelled', 'update_in_review', 'will-be-removed'];
 
