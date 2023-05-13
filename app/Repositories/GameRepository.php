@@ -17,6 +17,7 @@ class GameRepository
         'hyper-casual' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
         'racing' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
         'victory' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
+        'other' => 'https://wallpapercave.com/wp/wp1868042.jpg',
     ];
 
     public const GAME_PAGINATION_PER_PAGE = 3;
