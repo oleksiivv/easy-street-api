@@ -32,6 +32,22 @@ class AdministratorRepository
         }
     }
 
+    public function removeModerator(string $administratorEmail, string $moderatorEmail, int $administratorId): Administrator
+    {
+        $administrator = Administrator::where([
+            'user_id' => $administratorId,
+        ])->firstOrFail();
+
+        $moderators = array_filter($administrator->moderators, function ($email) use ($moderatorEmail) {
+            return $email !== $moderatorEmail;
+        });
+
+        $administrator->moderators = $moderators;
+        $administrator->save();
+
+        return $administrator;
+    }
+
     public function getByAdministratorUserId(int $administratorUserId): Administrator
     {
         return Administrator::where([

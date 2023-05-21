@@ -30,13 +30,15 @@ class AddPublisherTeamMemberUseCase
     public function handle(int $companyId, array $memberSearchCriteria): Company
     {
         try {
-            $user = $this->userRepository->findBy($memberSearchCriteria);
+            $user = $this->userRepository->findBy([
+                'email' => $memberSearchCriteria['email'],
+            ]);
 
-            Assert::eq($this->roleRepository->get($user->role_id)->name, Role::ROLE_CUSTOMER);
+            //Assert::eq($this->roleRepository->get($user->role_id)->name, Role::ROLE_CUSTOMER);
 
             $company = $this->companyRepository->get($companyId);
 
-            $teamMembersIds = $company->team_members;
+            $teamMembersIds = array_column($company->team_members, 'id');
             $teamMembersIds[] = $user->id;
 
             $this->mailService->sendNewTeamMemberInvitation($user->email, [
@@ -44,12 +46,22 @@ class AddPublisherTeamMemberUseCase
                 'companyName' => $company->name,
             ], 'Invitation to the team');
 
-            $user->role_id = $this->roleRepository->findByName(Role::ROLE_PUBLISHER_TEAM_MEMBER)->id;
+            //TODO: fix after diploma
+            if ($user->role->name === Role::ROLE_CUSTOMER) {
+                $user->role_id = $this->roleRepository->findByName(Role::ROLE_PUBLISHER_TEAM_MEMBER)->id;
+            }
+
             $user->save();
 
             return $this->companyRepository->update($companyId, [
                 'team_members' => collect(array_unique($teamMembersIds))->map(function ($id) {
-                    return $this->userRepository->get($id);
+                    $user = $this->userRepository->get($id);
+                    return [
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->last_name,
+                        'email' => $user->email,
+                        'id' => $user->id,
+                    ];
                 })->toArray(),
             ]);
         } catch (Throwable $exception) {

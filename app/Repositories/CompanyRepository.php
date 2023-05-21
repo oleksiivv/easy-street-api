@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -49,6 +50,18 @@ class CompanyRepository
         $result['pagination'] = [];
 
         return $result;
+    }
+
+    public function companiesByTeamMemberUserId(int $teamMemberUserId): Collection
+    {
+        $user = User::findOrFail($teamMemberUserId);
+
+        return Company::query()->whereJsonContains('team_members', [
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'email' => $user->email,
+            'id' => $user->id,
+        ])->get();
     }
 
     public function create(array $data): Company

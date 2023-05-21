@@ -77,7 +77,7 @@ class CreateCompanyUseCase
                 'companyName' => $company->name,
             ], 'Company creating confirmation');
 
-            $this->managementTokenRepository->removeUser();
+            $this->managementTokenRepository->removeUser($company->publisher->password_sha . $company->publisher->email . $company->publisher->id);
             $this->managementTokenRepository->storeUser($company->publisher);
 
             return $company->refresh();

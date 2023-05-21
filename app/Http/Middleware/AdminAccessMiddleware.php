@@ -17,7 +17,7 @@ class AdminAccessMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-        $data = $this->managementTokenRepository->get($request);
+        $data = $this->managementTokenRepository->get($request->bearerToken());
         if (data_get($data, 'role') != Role::ROLE_ADMIN) {
             throw new HttpException(401);
         }

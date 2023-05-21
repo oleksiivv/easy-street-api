@@ -65,6 +65,7 @@ Route::group(['prefix' => '/publisher'], function () {
         Route::post('/', [CompanyController::class, 'create']);
         Route::put('/{id}', [CompanyController::class, 'update'])->middleware('publisher-access');
 
+        Route::get('/team-member/{id}', [CompanyController::class, 'companiesByTeamMember'])->middleware('customer-access');
 
         Route::get('/game/{gameId}/actions', [\App\Http\Controllers\PublisherGameActionsController::class, 'allPublisherActionsForGame'])->middleware('publisher-access');
         Route::get('/game/{gameId}/actions/all', [\App\Http\Controllers\PublisherGameActionsController::class, 'allForGame'])->middleware('publisher-access');
@@ -198,6 +199,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin-access'], function ()
 
         Route::group(['prefix' => '/moderators'], function () {
             Route::post('/', [\App\Http\Controllers\Administration\AdministratorController::class, 'createModerator']);
+            Route::delete('/', [\App\Http\Controllers\Administration\AdministratorController::class, 'removeModerator']);
         });
     });
 });

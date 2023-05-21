@@ -31,19 +31,20 @@ class AccountController extends Controller
         return new Response($loginUseCase->handle($loginRequest->all()));
     }
 
-    public function logout(): Response
+    public function logout(Request $request): Response
     {
-        $this->managementTokenRepository->removeUser();
+        $this->managementTokenRepository->removeUser($request->bearerToken());
 
         return response()->noContent();
     }
 
     public function tryLoginViaCache(Request $request): Response
     {
-        $data = $this->managementTokenRepository->get($request);
+        $data = $this->managementTokenRepository->get($request->bearerToken());
 
         if (data_get($data, 'user') === null) {
-            throw new UnauthorizedException('Unauthorized', 401);
+
+            throw new HttpException(401, 'Unauthorized');
         }
 
         return new Response($data['user']);

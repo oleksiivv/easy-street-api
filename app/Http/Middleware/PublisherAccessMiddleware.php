@@ -17,7 +17,7 @@ class PublisherAccessMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-        $data = $this->managementTokenRepository->get($request);
+        $data = $this->managementTokenRepository->get($request->bearerToken());
         if (!in_array(data_get($data, 'role'),  [Role::ROLE_PUBLISHER, Role::ROLE_PUBLISHER_TEAM_MEMBER])) {
             throw new HttpException(401);
         }
