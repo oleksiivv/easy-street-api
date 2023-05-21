@@ -5,36 +5,66 @@ namespace Tests\Unit\UseCases;
 use App\Http\Repositories\ManagementTokenRepository;
 use App\Models\User;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Cache;
-use PHPUnit\Exception;
+use App\UseCases\LoginUseCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class LoginUseCaseTest
+class LoginUseCaseTest extends TestCase
 {
-    public function __construct(private UserRepository $userRepository, private ManagementTokenRepository $managementTokenRepository)
+    private LoginUseCase $useCase;
+    private UserRepository $userRepository;
+    private ManagementTokenRepository $managementTokenRepository;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
+        // Create mock objects for dependencies
+        $this->userRepository = $this->createMock(UserRepository::class);
+        $this->managementTokenRepository = $this->createMock(ManagementTokenRepository::class);
+
+        // Create an instance of the LoginUseCase with the mock dependencies
+        $this->useCase = new LoginUseCase($this->userRepository, $this->managementTokenRepository);
     }
 
-    public function handle(array $data, bool $checkPassword = true): User
+    public function testHandleWithCorrectCredentials(): void
     {
-        try {
-            $searchParams = [
-                'email' => $data['email'],
-            ];
+        $email = 'test@example.com';
+        $password = 'password';
 
-            if ($checkPassword) {
-                $searchParams['password_sha'] = sha1($data['password']);
-            }
+        // Create a mock User object
+        $user = new User();
+        $user->email = $email;
+        $user->password_sha = sha1($password);
 
-            $user = $this->userRepository->findBy($searchParams);
+        $this->userRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['email' => $email, 'password_sha' => sha1($password)])
+            ->willReturn($user);
 
-            $this->managementTokenRepository->storeUser($user);
+        $this->managementTokenRepository
+            ->expects($this->once())
+            ->method('storeUser')
+            ->with($user);
 
-            return $user;
-        } catch (Throwable) {
-            throw new HttpException(Response::HTTP_UNAUTHORIZED);
-        }
+        $result = $this->useCase->handle(['email' => $email, 'password' => $password]);
+
+        $this->assertSame($user, $result);
+    }
+
+    public function testHandleWithIncorrectCredentials(): void
+    {
+        $email = 'test@example.com';
+        $password = 'password';
+
+        $this->userRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['email' => $email, 'password_sha' => sha1($password)]);
+
+        $this->useCase->handle(['email' => $email, 'password' => $password]);
     }
 }

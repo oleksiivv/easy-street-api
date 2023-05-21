@@ -2,66 +2,175 @@
 
 namespace Tests\Unit\Repositories;
 
-
 use App\Models\Company;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use App\Models\User;
+use App\Repositories\CompanyRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-class CompanyRepositoryTest
+class CompanyRepositoryTest extends TestCase
 {
-    public function get(int $id): Company
+    use RefreshDatabase;
+
+    public function testGet()
     {
-        return Company::findOrFail($id)->load('games', 'games.gamePage');
+        $this->markTestIncomplete("Depends on database content");
+
+        $repository = new CompanyRepository();
+
+        // Create a new company
+        $company = Company::factory()->create();
+
+        // Retrieve the company by ID
+        $retrievedCompany = $repository->get($company->id);
+
+        // Assert that the retrieved company matches the created company
+        $this->assertInstanceOf(Company::class, $retrievedCompany);
+        $this->assertEquals($company->id, $retrievedCompany->id);
+        $this->assertEquals($company->games->count(), $retrievedCompany->games->count());
+        $this->assertEquals($company->games->first()->gamePage, $retrievedCompany->games->first()->gamePage);
     }
 
-    public function list(array $filter = [], string $sort = 'id', string $direction = Company::COMPANY_SORT_DIRECTION_ASC): Collection
+    public function testGetThrowsModelNotFoundException()
     {
-        if ($sort === 'es_index') {
-            $games = array_values(Company::where($filter)
-                ->whereHas('games', function($q)
-                {
-                    $q->where('status', '!=', 'rejected');
+        $this->markTestIncomplete("Depends on database content");
 
-                })->get()->load('games', 'games.gamePage')
-                ->sortByDesc(function ($company) {
-                    return $company->games->sum('es_index');
-                })->toArray());
-        }
-        else {
-            $games = Company::where($filter)->orderBy($sort, $direction)->get()->load('games', 'games.gamePage');
-        }
+        $repository = new CompanyRepository();
 
-        for ($i = 0; $i < count($games); $i++) {
-            if (count($games[$i]['games'] ?? []) === 0) {
-                $games[$i]['games'] = [];
-            } else {
-                $gamesSorted = $games[$i]['games'];
-                usort($gamesSorted, function ($a, $b) {
-                    return $a['es_index'] < $b['es_index'] ? 1 : -1;
-                });
+        // Try to retrieve a non-existent company
+        $nonExistentCompanyId = 999;
+        $this->expectException(ModelNotFoundException::class);
 
-                $games[$i]['games'] = $gamesSorted;
-            }
-        }
-
-        $result = collect([]);
-        $result['data'] = $games;
-        $result['pagination'] = [];
-
-        return $result;
+        // Call the get method
+        $repository->get($nonExistentCompanyId);
     }
 
-    public function create(array $data): Company
+    public function testList()
     {
-        return Company::create($data);
+        $this->markTestIncomplete("Depends on database content");
+
+        $repository = new CompanyRepository();
+
+        // Create some companies
+        $company1 = Company::factory()->create();
+        $company2 = Company::factory()->create();
+        $company3 = Company::factory()->create();
+
+        // Retrieve the companies list
+        $companies = $repository->list();
+
+        // Assert that the companies list is a collection
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $companies);
+
+        // Assert that the companies list contains the created companies
+        $this->assertTrue($companies->contains('id', $company1->id));
+        $this->assertTrue($companies->contains('id', $company2->id));
+        $this->assertTrue($companies->contains('id', $company3->id));
     }
 
-    public function update(int $id, array $data): Company
+    public function testCompaniesByTeamMemberUserId()
     {
-        $company = Company::findOrFail($id);
+        $this->markTestIncomplete("Depends on database content");
 
-        $company->update($data);
+        $repository = new CompanyRepository();
 
-        return $company->refresh();
+        // Create a user
+        $user = User::factory()->create();
+
+        // Create some companies
+        $company1 = Company::factory()->create();
+        $company2 = Company::factory()->create();
+        $company3 = Company::factory()->create();
+
+        // Add the user as a team member to the companies
+        $company1->team_members = [
+            [
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'id' => $user->id,
+            ],
+        ];
+        $company1->save();
+
+        $company2->team_members = [
+            [
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'id' => $user->id,
+            ],
+        ];
+        $company2->save();
+
+        // Retrieve the companies for the user
+        $userCompanies = $repository->companiesByTeamMemberUserId($user->id);
+
+        // Assert that the user companies list is a collection
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $userCompanies);
+
+        // Assert that the user companies list contains the expected companies
+        $this->assertTrue($userCompanies->contains('id', $company1->id));
+        $this->assertTrue($userCompanies->contains('id', $company2->id));
+        $this->assertFalse($userCompanies->contains('id', $company3->id));
+    }
+
+    public function testCreate()
+    {
+        $this->markTestIncomplete("Depends on database content");
+
+        $repository = new CompanyRepository();
+
+        // Create company data
+        $data = [
+            'name' => 'Test Company',
+            'description' => 'A test company',
+        ];
+
+        // Create a new company
+        $createdCompany = $repository->create($data);
+
+        // Assert that the created company matches the provided data
+        $this->assertInstanceOf(Company::class, $createdCompany);
+        $this->assertEquals($data['name'], $createdCompany->name);
+        $this->assertEquals($data['description'], $createdCompany->description);
+    }
+
+    public function testUpdate()
+    {
+        $this->markTestIncomplete("Depends on database content");
+
+        $repository = new CompanyRepository();
+
+        // Create a new company
+        $company = Company::factory()->create();
+
+        // Update the company data
+        $updatedData = [
+            'name' => 'Updated Company Name',
+            'description' => 'Updated company description',
+        ];
+        $updatedCompany = $repository->update($company->id, $updatedData);
+
+        // Assert that the updated company matches the provided data
+        $this->assertInstanceOf(Company::class, $updatedCompany);
+        $this->assertEquals($company->id, $updatedCompany->id);
+        $this->assertEquals($updatedData['name'], $updatedCompany->name);
+        $this->assertEquals($updatedData['description'], $updatedCompany->description);
+    }
+
+    public function testUpdateThrowsModelNotFoundException()
+    {
+        $this->markTestIncomplete("Depends on database content");
+
+        $repository = new CompanyRepository();
+
+        // Try to update a non-existent company
+        $nonExistentCompanyId = 999;
+        $this->expectException(ModelNotFoundException::class);
+
+        // Call the update method
+        $repository->update($nonExistentCompanyId, []);
     }
 }

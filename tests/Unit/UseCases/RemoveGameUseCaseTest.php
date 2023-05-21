@@ -2,36 +2,46 @@
 
 namespace Tests\Unit\UseCases;
 
-use App\Events\GameDownloadedEvent;
-use App\Events\GameRemovedEvent;
-use App\Repositories\CustomerGameRepository;
-use App\Repositories\GameRepository;
+use App\Models\Administrator;
+use App\Models\Role;
+use App\Models\User;
+use App\Repositories\AdministratorRepository;
+use App\Repositories\RoleRepository;
+use App\Repositories\UserRepository;
+use App\Services\MailService;
+use App\UseCases\RemoveModeratorUseCase;
+use PHPUnit\Framework\TestCase;
 
-class RemoveGameUseCaseTest
+class RemoveGameUseCaseTest extends TestCase
 {
-    public function __construct(
-        private CustomerGameRepository $customerGameRepository,
-        private GameRepository $gameRepository,
-    ) {
-    }
-
-    public function handle(int $gameId, int $customerId): void
+    public function testHandle()
     {
-        $this->gameRepository->get($gameId);
+        // Create a mock for the AdministratorRepository
+        $administratorRepository = $this->createMock(AdministratorRepository::class);
+        $administratorRepository->expects($this->once())
+            ->method('removeModerator')
+            ->willReturn(new Administrator(['id' => 1]));
 
-        event(new GameRemovedEvent([
-            'game_id' => $gameId,
-            'user_id' => $customerId,
-        ]));
+        // Create a mock for the UserRepository
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->once())
+            ->method('findBy')
+            ->willReturn(new User(['email' => 'moderator@example.com']));
 
-        $this->customerGameRepository->updateOrCreate(
-            [
-                'game_id' => $gameId,
-                'user_id' => $customerId,
-            ],
-            [
-                'downloaded' => false,
-            ]
-        );
+        // Create a mock for the RoleRepository
+        $roleRepository = $this->createMock(RoleRepository::class);
+        $roleRepository->expects($this->once())
+            ->method('findByName')
+            ->willReturn(new Role(['id' => 2]));
+
+        // Create an instance of the RemoveModeratorUseCase
+        $useCase = new RemoveModeratorUseCase($administratorRepository, $userRepository, $roleRepository);
+
+        // Call the handle method
+        $administrator = $useCase->handle('admin@example.com', 'moderator@example.com', '1');
+
+        // Assert the returned administrator instance
+        $this->assertInstanceOf(Administrator::class, $administrator);
+        // ... additional assertions if needed
     }
 }

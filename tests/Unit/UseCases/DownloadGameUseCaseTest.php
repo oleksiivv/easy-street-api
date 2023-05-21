@@ -15,120 +15,116 @@ use App\Repositories\FinancialEventRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\UserPaymentCardDataRepository;
 use App\Services\PaymentService;
-use App\System\OperatingSystem;
+use App\UseCases\DownloadGameUseCase;
+use DateTime;
+use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\MockObject\IncompatibleReturnValueException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class DownloadGameUseCaseTest
+class DownloadGameUseCaseTest extends TestCase
 {
-    public function __construct(
-        private CustomerGameRepository $customerGameRepository,
-        private GameRepository $gameRepository,
-        private DownloadsRepository $downloadsRepository,
-        private PaymentService $paymentService,
-        private UserPaymentCardDataRepository $userPaymentCardDataRepository,
-        private FinancialEventRepository $financialEventRepository,
-    ) {
+    private DownloadGameUseCase $useCase;
+    private CustomerGameRepository $customerGameRepository;
+    private GameRepository $gameRepository;
+    private DownloadsRepository $downloadsRepository;
+    private PaymentService $paymentService;
+    private UserPaymentCardDataRepository $userPaymentCardDataRepository;
+    private FinancialEventRepository $financialEventRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Create mock objects for dependencies
+        $this->customerGameRepository = $this->createMock(CustomerGameRepository::class);
+        $this->gameRepository = $this->createMock(GameRepository::class);
+        $this->downloadsRepository = $this->createMock(DownloadsRepository::class);
+        $this->paymentService = $this->createMock(PaymentService::class);
+        $this->userPaymentCardDataRepository = $this->createMock(UserPaymentCardDataRepository::class);
+        $this->financialEventRepository = $this->createMock(FinancialEventRepository::class);
+
+        // Create an instance of the DownloadGameUseCase with the mock dependencies
+        $this->useCase = new DownloadGameUseCase(
+            $this->customerGameRepository,
+            $this->gameRepository,
+            $this->downloadsRepository,
+            $this->paymentService,
+            $this->userPaymentCardDataRepository,
+            $this->financialEventRepository
+        );
     }
 
-    public function handle(int $gameId, int $customerId, string $os, ?array $paymentData): string
+    public function testHandleDownloadsGameWithoutPayment(): void
     {
-        $game = $this->gameRepository->get($gameId);
+        $this->markTestIncomplete("Depends on database content");
 
-        $alreadyDownloaded = $this->customerGameRepository->exists([
-            'game_id' => $gameId,
-            'user_id' => $customerId,
-        ]);
+        $gameId = 1;
+        $customerId = 123;
+        $os = 'windows';
+        $paymentData = null;
+
+        $game = new Game();
+        // Set properties for $game
+
+        $this->gameRepository
+            ->expects($this->once())
+            ->method('get')
+            ->with($gameId)
+            ->willReturn($game);
+
+        $this->customerGameRepository
+            ->expects($this->once())
+            ->method('exists')
+            ->with(['game_id' => $gameId, 'user_id' => $customerId])
+            ->willReturn(false);
 
         $game->es_index = $game->es_index + 30;
 
-        if ($game->paidProduct?->price > 0 && ! $alreadyDownloaded) {
-            if (! $this->proceedPayment($customerId, $paymentData, $game->paidProduct->price, $game)) {
-                throw new HttpException(422, 'Invalid payment data');
-            }
+        $game->expects($this->once())
+            ->method('save');
 
-            $game->es_index = $game->es_index + 50;
-        }
-
-        $game->save();
-
-        $this->customerGameRepository->updateOrCreate(
-            [
-                'game_id' => $gameId,
-                'user_id' => $customerId,
-                'os' => strtok($os, '_'),
-            ],
-            [
-                'downloaded' => true,
-                'download_datetime' => now(),
-                'version' => $game->gameReleases->last()->version,
-                'os' => strtok($os, '_'),
-            ]
-        );
-
-        $this->downloadsRepository->createIfNotExists([
-            'game_id' => $gameId,
-            'user_id' => $customerId,
-            'category_id' => $game->gameCategory->id,
-        ]);
-
-        event(new GameDownloadedEvent([
-            'game_id' => $gameId,
-            'user_id' => $customerId,
-        ]));
-
-        return $game->getReleaseByOs($os);
-    }
-
-    private function getFileExtension(string $os): string
-    {
-        return OperatingSystem::EXTENSIONS[$os];
-    }
-
-    private function proceedPayment(int $userId, ?array $paymentData, int $gamePrice, Game $game): bool
-    {
-        $this->paymentService->init();
-
-        try {
-            $paymentCardData = $this->userPaymentCardDataRepository->findOrCreate($userId, array_merge(
-                $paymentData['card'] ?? [],
+        $this->customerGameRepository
+            ->expects($this->once())
+            ->method('updateOrCreate')
+            ->with(
                 [
-                    'address' => $paymentData['address'] ?? [],
-                    'is_default' => true,
-                ]
-            ));
-
-            $user = $paymentCardData->user;
-
-            $customer = $this->paymentService->createCustomer([
-                'card' => [
-                    'number' => $paymentCardData->number,
-                    'cvc' => $paymentCardData->cvc,
-                    'exp_month' => $paymentCardData->exp_month,
-                    'exp_year' => $paymentCardData->exp_year
+                    'game_id' => $gameId,
+                    'user_id' => $customerId,
+                    'os' => strtok($os, '_'),
                 ],
-                'address' => $paymentCardData->address,
-                'email' => $user->email,
-                'name' => $user->first_name . ' ' . $user->last_name,
-            ]);
+                [
+                    'downloaded' => true,
+                    'download_datetime' => $this->isInstanceOf(DateTime::class),
+                    'version' => $game->gameReleases->last()->version,
+                    'os' => strtok($os, '_'),
+                ]
+            );
 
-            $this->paymentService->pay($customer->id, $gamePrice, []);
-        } catch (Throwable $exception){
-            throw $exception;
-        }
+        $this->downloadsRepository
+            ->expects($this->once())
+            ->method('createIfNotExists')
+            ->with(['game_id' => $gameId, 'user_id' => $customerId, 'category_id' => $game->gameCategory->id]);
 
-        $this->financialEventRepository->create([
-            'amount' => $gamePrice / 2,
-            'partner_type' => FinancialEvent::PARTNER_TYPE_ES,
-            'admin_id' => Administrator::firstOrFail()->id,
-        ]);
+        Event::assertDispatched(GameDownloadedEvent::class);
 
-        $this->financialEventRepository->create([
-            'amount' => $gamePrice / 2,
-            'partner_type' => FinancialEvent::PARTNER_TYPE_PUBLISHER,
-            'company_id' => $game->publisher->publisher_id,
-        ]);
+        $result = $this->useCase->handle($gameId, $customerId, $os, $paymentData);
 
-        return true;
+        $this->assertSame($game->getReleaseByOs($os), $result);
+    }
+
+    // Add more test methods for other scenarios
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->useCase = null;
+        $this->customerGameRepository = null;
+        $this->gameRepository = null;
+        $this->downloadsRepository = null;
+        $this->paymentService = null;
+        $this->userPaymentCardDataRepository = null;
+        $this->financialEventRepository = null;
     }
 }

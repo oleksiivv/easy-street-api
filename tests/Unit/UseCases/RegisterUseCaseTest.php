@@ -2,73 +2,60 @@
 
 namespace Tests\Unit\UseCases;
 
-use App\Models\Administrator;
-use App\Models\Company;
-use App\Models\Role;
+namespace Tests\Unit\UseCases;
+
 use App\Models\User;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use App\Services\MailService;
-use Illuminate\Support\Facades\Cache;
+use App\UseCases\LoginUseCase;
+use App\UseCases\RegisterUseCase;
 use Illuminate\Support\Str;
-use PHPUnit\Exception;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class RegisterUseCaseTest
+class RegisterUseCaseTest extends TestCase
 {
-    public function __construct(
-        private UserRepository   $userRepository,
-        private LoginUseCaseTest $loginUseCase,
-        private MailService      $mailService,
-        private RoleRepository   $roleRepository,
-    ) {
+    private UserRepository $userRepository;
+    private LoginUseCase $loginUseCase;
+    private MailService $mailService;
+    private RoleRepository $roleRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Create mock objects or use dependency injection to set up the dependencies
+
+        $this->userRepository = $this->createMock(UserRepository::class);
+        $this->loginUseCase = $this->createMock(LoginUseCase::class);
+        $this->mailService = $this->createMock(MailService::class);
+        $this->roleRepository = $this->createMock(RoleRepository::class);
     }
 
-    public function handle(array $data): User
+    public function testHandle(): void
     {
-        try {
-            $user = $this->loginUseCase->handle($data);
-        } catch (Throwable) {
-            try {
-                $data['password_sha'] = sha1($data['password']);
-                $data['role_id'] = $this->getRole($data['email']);
+        // Set up test data
+        $data = [
+            'email' => 'test@example.com',
+            'password' => 'password',
+            // Other required data
+        ];
 
-                $user = $this->userRepository->create($data);
-                $this->loginUseCase->handle($data);
+        // Set up expectations for login use case
+        $this->loginUseCase
+            ->expects($this->once())
+            ->method('handle')
+            ->with($data)
+            ->willReturn(new User()); // Return a User object or use a mock
 
-                $emailConfirmationToken = Str::uuid()->toString();
+        // Create an instance of the RegisterUseCase
+        $useCase = new RegisterUseCase($this->userRepository, $this->loginUseCase, $this->mailService, $this->roleRepository);
 
-                $user = $this->userRepository->update($user->id, [
-                    'email_confirmation_token' => $emailConfirmationToken,
-                ]);
-
-                $this->mailService->sendEmailConfirmation([$user->email], [
-                    'email' => $user->email,
-                    'name' => $user->first_name,
-                    'emailConfirmationToken' => $emailConfirmationToken,
-                ], 'Email Confirmation');
-            }
-            catch (Throwable $exception) {
-                throw new HttpException(422, "Wrong input data. Couldn't register your account. Please, try again.");
-            }
-        }
-
-        return $user;
-    }
-
-    private function getRole(string $email): int
-    {
-        $roleName = Role::ROLE_CUSTOMER;
-        if (Administrator::where('moderators', 'like', "%\"{$email}\"%")->exists()) {
-            $roleName = Role::ROLE_MODERATOR;
-        }
-
-        if (Company::where('team_members', 'like', "%\"{$email}\"%")->exists()) {
-            $roleName = Role::ROLE_PUBLISHER_TEAM_MEMBER;
-        }
-
-        return $this->roleRepository->findByName($roleName)->id;
+        // Call the handle method and assert the expected behavior
+        $user = $useCase->handle($data);
+        $this->assertInstanceOf(User::class, $user);
     }
 }

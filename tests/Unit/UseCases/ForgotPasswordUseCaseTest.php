@@ -6,45 +6,69 @@ use App\Http\Repositories\ManagementTokenRepository;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Services\MailService;
+use App\UseCases\ForgotPasswordUseCase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use PHPUnit\Exception;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 use Webmozart\Assert\Assert;
 
-class ForgotPasswordUseCaseTest
+class ForgotPasswordUseCaseTest extends TestCase
 {
-    public function __construct(private UserRepository $userRepository, private MailService $mailService, private ManagementTokenRepository $managementTokenRepository)
+    private ForgotPasswordUseCase $useCase;
+    private UserRepository $userRepository;
+    private MailService $mailService;
+    private ManagementTokenRepository $managementTokenRepository;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
+        // Create mock objects for dependencies
+        $this->userRepository = $this->createMock(UserRepository::class);
+        $this->mailService = $this->createMock(MailService::class);
+        $this->managementTokenRepository = $this->createMock(ManagementTokenRepository::class);
+
+        // Create an instance of the ForgotPasswordUseCase with the mock dependencies
+        $this->useCase = new ForgotPasswordUseCase($this->userRepository, $this->mailService, $this->managementTokenRepository);
     }
 
-    public function handle(string $email, string $newPassword): User
+    public function testHandleSendsEmailWithNewPassword(): void
     {
-        try {
-            $user = $this->userRepository->findBy([
-                'email' => $email,
-            ]);
+        $email = 'test@example.com';
+        $newPassword = 'newpassword';
 
-            $this->managementTokenRepository->removeUser();
+        // Create a mock User object
+        $user = new User();
+        $user->id = 1;
+        $user->email = $email;
+        $user->first_name = 'John';
+        $user->password_sha = 'abc123';
 
-            $passwordConfirmationToken = Str::uuid()->toString();
+        $this->userRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['email' => $email])
+            ->willReturn($user);
 
-            $user = $this->userRepository->update($user->id, [
-                'update_password_token' => $passwordConfirmationToken,
-            ]);
+        $this->managementTokenRepository
+            ->expects($this->once())
+            ->method('removeUser')
+            ->with($user->password_sha . $user->email . $user->id);
 
-            $this->mailService->sendEmailRecoverPassword($user->email, [
-                'name' => $user->first_name,
-                'email' => $user->email,
-                'passwordConfirmationToken' => $passwordConfirmationToken,
-                'newPassword' => sha1($newPassword),
-            ], 'New password confirmation');
-        } catch (Throwable $exception) {
-            throw new HttpException(Response::HTTP_UNAUTHORIZED);
-        }
+        $this->userRepository
+            ->expects($this->once())
+            ->method('update')
+            ->willReturn($user);
 
-        return $user;
+        $this->mailService
+            ->expects($this->once())
+            ->method('sendEmailRecoverPassword');
+
+        $result = $this->useCase->handle($email, $newPassword);
+
+        $this->assertSame($user, $result);
     }
 }

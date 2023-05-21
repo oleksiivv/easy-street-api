@@ -3,28 +3,51 @@
 namespace Tests\Unit\UseCases;
 
 use App\Repositories\UserPaymentCardDataRepository;
+use App\UseCases\MakePaymentCardInformationDefault;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\TestCase;
 
-class MakePaymentCardInformationDefaultTest
+class MakePaymentCardInformationDefaultTest extends TestCase
 {
-    public function __construct(private UserPaymentCardDataRepository $userPaymentCardDataRepository)
+    private MakePaymentCardInformationDefault $useCase;
+    private UserPaymentCardDataRepository $userPaymentCardDataRepository;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
+        // Create a mock UserPaymentCardDataRepository object
+        $this->userPaymentCardDataRepository = $this->createMock(UserPaymentCardDataRepository::class);
+
+        // Create an instance of the MakePaymentCardInformationDefault with the mock dependency
+        $this->useCase = new MakePaymentCardInformationDefault($this->userPaymentCardDataRepository);
     }
 
-    public function handle(int $userId, int $defaultPaymentCardId): Collection
+    public function testHandle(): void
     {
-        $this->userPaymentCardDataRepository->updateBy([
-            'user_id' => $userId
-        ], [
-            'is_default' => false,
-        ]);
+        $userId = 1;
+        $defaultPaymentCardId = 2;
 
-        $this->userPaymentCardDataRepository->update($defaultPaymentCardId, [
-            'is_default' => true,
-        ]);
+        $this->userPaymentCardDataRepository
+            ->expects($this->once())
+            ->method('updateBy')
+            ->with(['user_id' => $userId], ['is_default' => false]);
 
-        return $this->userPaymentCardDataRepository->findBy([
-            'user_id' => $userId,
-        ]);
+        $this->userPaymentCardDataRepository
+            ->expects($this->once())
+            ->method('update')
+            ->with($defaultPaymentCardId, ['is_default' => true]);
+
+        $expectedResult = new Collection();
+
+        $this->userPaymentCardDataRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['user_id' => $userId])
+            ->willReturn($expectedResult);
+
+        $result = $this->useCase->handle($userId, $defaultPaymentCardId);
+
+        $this->assertSame($expectedResult, $result);
     }
 }

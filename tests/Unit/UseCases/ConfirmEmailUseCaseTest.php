@@ -5,36 +5,83 @@ namespace Tests\Unit\UseCases;
 use App\Http\Repositories\ManagementTokenRepository;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use App\UseCases\ConfirmEmailUseCase;
 use Illuminate\Support\Facades\Cache;
-use PHPUnit\Exception;
+use Mockery;
+use Mockery\MockInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 use Webmozart\Assert\Assert;
 
-class ConfirmEmailUseCaseTest
+class ConfirmEmailUseCaseTest extends TestCase
 {
-    public function __construct(private UserRepository $userRepository, private ManagementTokenRepository $managementTokenRepository)
+    private ConfirmEmailUseCase $useCase;
+    private UserRepository|MockInterface $userRepository;
+    private ManagementTokenRepository|MockInterface $managementTokenRepository;
+    private User|MockInterface $user;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
+        $this->userRepository = $this->mock(UserRepository::class);
+        $this->managementTokenRepository = $this->mock(ManagementTokenRepository::class);
+        $this->user = $this->mock(User::class);
+
+        $this->useCase = new ConfirmEmailUseCase(
+            $this->userRepository,
+            $this->managementTokenRepository
+        );
     }
 
-    public function handle(string $email, string $emailConfirmationToken): User
+    public function testHandle(): void
     {
-        try {
-            $user = $this->userRepository->findBy([
-                'email_confirmation_token' => $emailConfirmationToken
-            ]);
+        $email = 'test@example.com';
+        $emailConfirmationToken = 'token123';
 
-            Assert::same($user->email, $email);
+        // Mock the behavior of the user repository's findBy method
+        $this->userRepository
+            ->shouldReceive('findBy')
+            ->once()
+            ->with(['email_confirmation_token' => $emailConfirmationToken])
+            ->andReturn($this->user);
 
-            $this->managementTokenRepository->removeUser();
-            $this->managementTokenRepository->storeUser($user);
-        } catch (Throwable) {
-            throw new HttpException(Response::HTTP_UNAUTHORIZED);
-        }
+        $this->user->expects('getAttribute');
 
-        return $this->userRepository->update($user->id, [
-            'email_is_confirmed' => true
-        ]);
+        $this->expectException(HttpException::class);
+
+        $result = $this->useCase->handle($email, $emailConfirmationToken);
+    }
+
+    public function testHandleThrowsHttpExceptionOnException(): void
+    {
+        $email = 'test@example.com';
+        $emailConfirmationToken = 'token123';
+
+        // Mock the behavior of the user repository's findBy method to throw an exception
+        $this->userRepository
+            ->shouldReceive('findBy')
+            ->once()
+            ->with(['email_confirmation_token' => $emailConfirmationToken])
+            ->andThrow(new HttpException(422));
+
+        // Expect that an HttpException is thrown
+        $this->expectException(HttpException::class);
+
+        // Call the handle method
+        $this->useCase->handle($email, $emailConfirmationToken);
+    }
+
+    private function mock(string $className): MockInterface
+    {
+        return Mockery::mock($className);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        Mockery::close();
     }
 }

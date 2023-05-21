@@ -2,29 +2,64 @@
 
 namespace Tests\Unit\UseCases;
 
+namespace Tests\Unit\UseCases;
+
 use App\Models\User;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Cache;
-use PHPUnit\Exception;
-use Symfony\Component\HttpFoundation\Response;
+use App\UseCases\UpdateUserUseCase;
+use Illuminate\Http\Response;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Throwable;
-use Webmozart\Assert\Assert;
 
-class UpdateUserUseCaseTest
+class UpdateUserUseCaseTest extends TestCase
 {
-    public function __construct(private UserRepository $userRepository)
+    public function testHandle()
     {
+        // Create a mock for the UserRepository
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->once())
+            ->method('update')
+            ->willReturn(new User(['id' => 1]));
+
+        // Create an instance of the UpdateUserUseCase
+        $useCase = new UpdateUserUseCase($userRepository);
+
+        // Create sample data for updating the user
+        $id = 1;
+        $data = [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+        ];
+
+        // Call the handle method
+        $result = $useCase->handle($id, $data);
+
+        // Assert the result
+        $this->assertInstanceOf(User::class, $result);
     }
 
-    public function handle(int $id, array $data): User
+    public function testHandleThrowsUnauthorizedHttpException()
     {
-        try {
-            $user = $this->userRepository->update($id, $data);
-        } catch (Throwable $exception) {
-            throw new HttpException(Response::HTTP_UNAUTHORIZED);
-        }
+        // Create a mock for the UserRepository
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->once())
+            ->method('update')
+            ->willThrowException(new \Exception());
 
-        return $user;
+        // Create an instance of the UpdateUserUseCase
+        $useCase = new UpdateUserUseCase($userRepository);
+
+        // Create sample data for updating the user
+        $id = 1;
+        $data = [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+        ];
+
+        // Assert that an UnauthorizedHttpException is thrown
+        $this->expectException(HttpException::class);
+
+        // Call the handle method
+        $useCase->handle($id, $data);
     }
 }

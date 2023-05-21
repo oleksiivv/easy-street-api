@@ -7,31 +7,37 @@ use App\Events\GameRemovedEvent;
 use App\Models\Game;
 use App\Repositories\CustomerGameRepository;
 use App\Repositories\GameRepository;
+use App\UseCases\RemoveGameFromFavouritesUseCase;
+use PHPUnit\Framework\TestCase;
 
-class RemoveGameFromFavouritesUseCaseTest
+class RemoveGameFromFavouritesUseCaseTest extends TestCase
 {
-    public function __construct(
-        private CustomerGameRepository $customerGameRepository,
-        private GameRepository $gameRepository,
-    ) {
-    }
-
-    public function handle(int $gameId, int $customerId): Game
+    public function testHandle()
     {
-        $game = $this->gameRepository->get($gameId);
+        // Create a mock for the CustomerGameRepository
+        $customerGameRepository = $this->createMock(CustomerGameRepository::class);
+        $customerGameRepository->expects($this->once())
+            ->method('updateOrCreate')
+            ->willReturnCallback(function ($attributes, $values) {
+                $this->assertSame(['game_id' => 1, 'user_id' => 1], $attributes);
+                $this->assertSame(['favourite' => false], $values);
+                return true;
+            });
 
-        $this->gameRepository->addToESIndex($gameId, -10);
+        // Create a mock for the GameRepository
+        $gameRepository = $this->createMock(GameRepository::class);
+        $gameRepository->expects($this->once())
+            ->method('get')
+            ->willReturn(new Game(['id' => 1]));
 
-        $this->customerGameRepository->updateOrCreate(
-            [
-                'game_id' => $gameId,
-                'user_id' => $customerId,
-            ],
-            [
-                'favourite' => false,
-            ]
-        );
+        // Create an instance of the RemoveGameFromFavouritesUseCase
+        $useCase = new RemoveGameFromFavouritesUseCase($customerGameRepository, $gameRepository);
 
-        return $game->refresh();
+        // Call the handle method
+        $game = $useCase->handle(1, 1);
+
+        // Assert the returned game instance
+        $this->assertInstanceOf(Game::class, $game);
+        // ... additional assertions if needed
     }
 }
