@@ -23,7 +23,12 @@ class GameAccessService
 
         $moderators = $game->publisher->moderators;
 
-        if (in_array($user->email, $moderators ?? [])) {
+        if (in_array([
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'email' => $user->email,
+            'id' => $user->id,
+        ], $moderators ?? [])) {
             return false;
         }
 
