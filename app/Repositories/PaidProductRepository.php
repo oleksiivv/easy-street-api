@@ -41,7 +41,7 @@ class PaidProductRepository
 
             $paidProduct->save();
         } catch (Throwable) {
-            $paidProduct = $this->create($dto, $id);
+            $paidProduct = $this->create($dto, $dto->game_id);
         }
 
         return $paidProduct->refresh();
