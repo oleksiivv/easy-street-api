@@ -16,6 +16,7 @@ class PaidProduct extends Model
 
     protected $fillable = [
         'price',
+        'new_price',
         'currency',
         'game_id',
     ];

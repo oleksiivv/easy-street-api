@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Administration;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Administration\UpdateGameESIndexRequest;
 use App\Http\Requests\Administration\UpdateGameRequest;
+use App\Models\Game;
 use App\Models\GameAction;
 use App\Repositories\GameActionRepository;
 use App\Repositories\GameRepository;
@@ -70,6 +71,16 @@ class ModeratorController extends Controller
             'user_id' => $request->user_id,
             'performed_by' => GameAction::PERFORMED_BY_MODERATOR,
         ]);
+
+        if ($request->getGameDTO()->approved) {
+            if ($game->paidProduct?->new_price >= 0) {
+                $game->paidProduct->price = $game->paidProduct->new_price;
+                $game->paidProduct->new_price = -1;
+
+                $game->paidProduct->save();
+                $game->refresh();
+            }
+        }
 
         return new Response($game);
     }

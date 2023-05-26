@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Administrator;
 use App\Models\FinancialEvent;
+use App\Models\Game;
 use App\Models\Payout;
 use App\Repositories\CompanyRepository;
 use App\Repositories\FinancialEventRepository;
 use App\Repositories\PayoutsRepository;
+use App\Repositories\UserPaymentCardDataRepository;
 use App\Services\MailService;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Throwable;
 use Webmozart\Assert\Assert;
 
 class PayoutsController extends Controller
@@ -19,7 +23,9 @@ class PayoutsController extends Controller
         private FinancialEventRepository $financialEventRepository,
         private PayoutsRepository $payoutsRepository,
         private MailService $mailService,
-        private CompanyRepository$companyRepository,
+        private CompanyRepository $companyRepository,
+        private PaymentService $paymentService,
+        private UserPaymentCardDataRepository $userPaymentCardDataRepository,
     )
     {
     }
@@ -89,6 +95,8 @@ class PayoutsController extends Controller
     {
         $payout = $this->payoutsRepository->get($payoutId);
 
+        //$this->proceedPayment($payout->user->id, [], -$payout->amount);
+
         $this->mailService->sendPayoutRequestConfirmation($payout->user->email, [
             'amount' => $payout->amount,
         ], 'Payout confirmed');
@@ -97,4 +105,41 @@ class PayoutsController extends Controller
             'status' => Payout::STATUS_CONFIRMED,
         ]));
     }
+
+    private function proceedPayment(int $userId, ?array $paymentData, int $amount): bool
+    {
+        $this->paymentService->init();
+
+        try {
+            $paymentCardData = $this->userPaymentCardDataRepository->findOrCreate($userId, array_merge(
+                $paymentData['card'] ?? [],
+                [
+                    'address' => $paymentData['address'] ?? [],
+                    'is_default' => true,
+                ]
+            ));
+
+            $user = $paymentCardData->user;
+
+            $customer = $this->paymentService->createCustomer([
+                'card' => [
+                    'number' => $paymentCardData->number,
+                    'cvc' => $paymentCardData->cvc,
+                    'exp_month' => $paymentCardData->exp_month,
+                    'exp_year' => $paymentCardData->exp_year
+                ],
+                'address' => $paymentCardData->address,
+                'email' => $user->email,
+                'name' => $user->first_name . ' ' . $user->last_name,
+            ]);
+
+            $this->paymentService->pay($customer->id, $amount, []);
+        } catch (Throwable $exception){
+            dd($exception->getMessage());
+            throw $exception;
+        }
+
+        return true;
+    }
+
 }

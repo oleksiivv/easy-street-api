@@ -38,6 +38,7 @@ class DownloadGameUseCase
         $alreadyDownloaded = $this->customerGameRepository->exists([
             'game_id' => $gameId,
             'user_id' => $customerId,
+            'downloaded' => true
         ]);
 
         $game->es_index = $game->es_index + 30;

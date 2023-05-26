@@ -9,22 +9,39 @@ use Throwable;
 
 class PaidProductRepository
 {
-    public function create(PaidProductDTO $data, int $gameId): PaidProduct
+    public function create(PaidProductDTO $dto, int $gameId): PaidProduct
     {
-        $data->game_id = $gameId;
+        $dto->game_id = $gameId;
 
-        return PaidProduct::create(array_filter($data->toArray()));
+        $data = array_filter($dto->toArray(), function ($item) {
+            return $item !== null;
+        });
+
+        $newPrice = $dto->price;
+        $data['new_price'] = $newPrice;
+        $data['price'] = 0;
+
+        return PaidProduct::create($data);
     }
 
-    public function update(?int $id, PaidProductDTO $data): PaidProduct
+    public function update(?int $id, PaidProductDTO $dto): PaidProduct
     {
         try {
             $paidProduct = PaidProduct::find($id);
-            $paidProduct->update(array_filter($data->toArray()));
+
+            $data = array_filter($dto->toArray(), function ($item) {
+                return $item !== null;
+            });
+
+            $newPrice = $dto->price;
+            $data['new_price'] = $newPrice;
+            $data['price'] = $paidProduct->price;
+
+            $paidProduct->update($data);
 
             $paidProduct->save();
         } catch (Throwable) {
-            $paidProduct = PaidProduct::create(array_filter($data->toArray()));
+            $paidProduct = $this->create($dto, $id);
         }
 
         return $paidProduct->refresh();
