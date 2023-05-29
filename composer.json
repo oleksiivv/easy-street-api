@@ -9,7 +9,7 @@
         "doctrine/dbal": "^3.6",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/cashier": "^14.6",
-        "laravel/framework": "^9.52",
+        "laravel/framework": "^9.24",
         "laravel/sanctum": "^3.0",
         "laravel/socialite": "^5.6",
         "laravel/tinker": "^2.7",
