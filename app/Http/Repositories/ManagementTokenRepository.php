@@ -20,7 +20,6 @@ class ManagementTokenRepository
 
         Cache::put($key, $data, now()->addMinutes(60));
 
-        dd($this->get($key));
         //session([$key => json_encode($data)]);
         //dd(session($key), $key);
         //Cookie::queue($key, json_encode($data), 60);
