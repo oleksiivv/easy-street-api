@@ -18,6 +18,8 @@ class ManagementTokenRepository
             'role' => $user->role->name,
         ];
 
+        dd($key, $data);
+
         Cache::put($key, $data, now()->addMinutes(60));
         //session([$key => json_encode($data)]);
         //dd(session($key), $key);
