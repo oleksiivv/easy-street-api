@@ -144,6 +144,7 @@ class CompanyController extends Controller
 
     public function companiesByTeamMember(Request $request, int $userId): Response
     {
+        dd(data_get($request, 'user.id'), $userId);
         if (data_get($request, 'user.id') !== $userId)
         {
             throw new HttpException(401, 'Unauthorized');
