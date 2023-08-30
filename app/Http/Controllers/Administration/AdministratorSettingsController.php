@@ -7,60 +7,42 @@ use App\Http\Requests\Administration\RemoveModeratorRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\AdministratorRepository;
+use App\Repositories\AdminSettingsRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
+use App\Services\SettingsCacheService;
 use App\UseCases\CreateModeratorUseCase;
 use App\UseCases\RemoveModeratorUseCase;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Throwable;
-use Webmozart\Assert\Assert;
+use Illuminate\Support\Facades\Cache;
 
-class AdministratorController
+class AdministratorSettingsController
 {
     public function __construct(
-        private CreateModeratorUseCase $createModeratorUseCase,
-        private RemoveModeratorUseCase $removeModeratorUseCase,
-        private UserRepository $userRepository,
-        private RoleRepository $roleRepository,
-        private AdministratorRepository $administratorRepository,
+        private AdminSettingsRepository $adminSettingsRepository,
+        private SettingsCacheService $settingsCacheService,
     ) {
     }
 
-    public function createModerator(int $administratorId, CreateModeratorRequest $request): Response
+    public function getByAdmin(int $adminId): Response
     {
-        try {
-            $administrator = $this->userRepository->findBy([
-                'email' => $request->administrator_email,
-                'role_id' => $this->roleRepository->findByName(Role::ROLE_ADMIN)->id,
-            ]);
-
-            Assert::same($administratorId, $administrator->id);
-        } catch (Throwable $e) {
-            throw new HttpException(401, $e);
-        }
-
-        return new Response($this->createModeratorUseCase->handle($request->administrator_email, $request->moderator_email, $administratorId));
+        return new Response($this->adminSettingsRepository->getByAdminId($adminId));
     }
 
-    public function removeModerator(int $administratorId, RemoveModeratorRequest $request): Response
+    public function general(int $adminId=1): Response
     {
-        try {
-            $administrator = $this->userRepository->findBy([
-                'email' => $request->administrator_email,
-                'role_id' => $this->roleRepository->findByName(Role::ROLE_ADMIN)->id,
-            ]);
-
-            Assert::same($administratorId, $administrator->id);
-        } catch (Throwable $e) {
-            throw new HttpException(401, $e);
-        }
-
-        return new Response($this->removeModeratorUseCase->handle($request->administrator_email, $request->moderator_email, $administratorId));
+        return new Response($this->settingsCacheService->general($adminId));
     }
 
-    public function getData(int $administratorId): Response
+    public function get(int $id): Response
     {
-        return new Response($this->administratorRepository->getByAdministratorUserId($administratorId));
+        return new Response($this->adminSettingsRepository->getByAdminId($id));
+    }
+
+    public function createOrUpdate(int $adminId, Request $request): Response
+    {
+        $this->settingsCacheService->clear($adminId);
+        return new Response($this->adminSettingsRepository->createOrUpdate($adminId, $request->all()));
     }
 }

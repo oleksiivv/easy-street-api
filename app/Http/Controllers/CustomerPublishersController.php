@@ -54,10 +54,15 @@ class CustomerPublishersController extends Controller
     {
         $company = $this->companyRepository->get($id);
 
+        $likes = $this->likesRepository->getMiddleForCompany($company->id);
+        $likesTotal = $this->likesRepository->getCountForCompany($company->id);
+        $downloads = $this->downloadsRepository->getCountForCompany($company->id);
+
         return new Response([
-            'downloads' => $this->downloadsRepository->getCountForCompany($company->id),
-            'likes' => $this->likesRepository->getMiddleForCompany($company->id),
-            'likes_total' => $this->likesRepository->getCountForCompany($company->id),
+            'downloads' => $downloads,
+            'likes' => $likes,
+            'likes_total' => $likesTotal,
+            'likes_percentage' => $downloads !== 0 ? round($likes / $downloads * 100) : ($likes>0?100:0),
             'subscriptions' => $this->userSubscriptionsRepository->getCount($company->id),
             'company' => $company->toArray(),
         ]);

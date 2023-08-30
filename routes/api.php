@@ -201,6 +201,11 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin-access'], function ()
             Route::post('/', [\App\Http\Controllers\Administration\AdministratorController::class, 'createModerator']);
             Route::delete('/', [\App\Http\Controllers\Administration\AdministratorController::class, 'removeModerator']);
         });
+
+        Route::group(['prefix' => '/settings'], function () {
+            Route::post('/', [\App\Http\Controllers\Administration\AdministratorSettingsController::class, 'createOrUpdate']);
+            Route::get('/', [\App\Http\Controllers\Administration\AdministratorSettingsController::class, 'getByAdmin']);
+        });
     });
 });
 
@@ -216,4 +221,8 @@ Route::group(['prefix' => '/payouts'], function () {
 
     Route::get('/', [\App\Http\Controllers\PayoutsController::class, 'all']);
     Route::get('/{id}', [\App\Http\Controllers\PayoutsController::class, 'get']);
+});
+
+Route::group(['prefix' => '/settings'], function () {
+    Route::get('/{adminId}', [\App\Http\Controllers\Administration\AdministratorSettingsController::class, 'general']);
 });

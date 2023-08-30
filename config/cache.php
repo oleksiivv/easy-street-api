@@ -54,7 +54,7 @@ return [
             'path' => storage_path('framework/cache/data'),
         ],
 
-        'memcached' => [
+        /*'memcached' => [
             'driver' => 'memcached',
             'persistent_id' => 'memcached_pool_id',
             'sasl' => [
@@ -87,7 +87,7 @@ return [
                     'weight' => 100,
                 ];
             }, explode(",", env('MEMCACHIER_SERVERS', 'localhost:11211')))
-        ],
+        ],*/
 
         'redis' => [
             'driver' => 'redis',

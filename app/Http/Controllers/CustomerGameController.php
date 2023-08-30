@@ -74,10 +74,15 @@ class CustomerGameController extends Controller
     {
         $game = $this->gameRepository->get($id);
 
+        $likes = $this->likesRepository->getMiddle($game->id);
+        $likesTotal = $this->likesRepository->getCountForGame($game->id);
+        $downloads = $this->downloadsRepository->getCountForGame($game->id);
+
         return new Response([
-            'downloads' => $this->downloadsRepository->getCountForGame($game->id),
-            'likes' => $this->likesRepository->getMiddle($game->id),
-            'likes_total' => $this->likesRepository->getCountForGame($game->id),
+            'downloads' => $downloads,
+            'likes' => $likes,
+            'likes_total' => $likesTotal,
+            'likes_percentage' => $downloads !== 0 ? round($likes / $downloads * 100) : ($likes>0?100:0),
             'game' => $game->toArray(),
         ]);
     }

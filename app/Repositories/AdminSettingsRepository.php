@@ -2,34 +2,58 @@
 
 namespace App\Repositories;
 
+use App\Models\AdminSettings;
 use App\Models\FinancialEvent;
 use App\Models\Payout;
 use Illuminate\Support\Collection;
 
-class FinancialEventRepository
+class AdminSettingsRepository
 {
-    public function create(array $data): FinancialEvent
+    public function createOrUpdate(int $adminId, array $data): AdminSettings
     {
-        return FinancialEvent::create($data);
+        try {
+            return $this->updateByAdminId($adminId, $data);
+        } catch (\Throwable) {
+            return $this->create(array_merge($data, [
+                'admin_id' => $adminId,
+            ]));
+        }
     }
 
-    public function getByCompanyId(int $companyId): Collection
+    public function create(array $data): AdminSettings
     {
-        return FinancialEvent::where(['company_id' => $companyId])->get();
+        return AdminSettings::create($data);
     }
 
-    public function getByAdminId(int $adminId): Collection
+    public function update(int $id, array $settings): AdminSettings
     {
-        return FinancialEvent::where(['admin_id' => $adminId])->get();
+        $adminSettings = AdminSettings::firstOrFail($id);
+
+        $adminSettings->update([
+            'settings' => $settings,
+        ]);
+
+        return $adminSettings->refresh();
     }
 
-    public function getTotalAmountByCompanyId(int $companyId): int|float
+    public function updateByAdminId(int $adminId, array $data): AdminSettings
     {
-        return array_sum(FinancialEvent::where(['company_id' => $companyId])->pluck('amount')->toArray());
+        $adminSettings = $this->getByAdminId($adminId);
+
+        $adminSettings->update([
+            'settings' => $data['settings'],
+        ]);
+
+        return $adminSettings->refresh();
     }
 
-    public function getTotalAmountByAdminId(int $adminId): int|float
+    public function getByAdminId(int $adminId): AdminSettings
     {
-        return array_sum(FinancialEvent::where(['admin_id' => $adminId])->pluck('amount')->toArray());
+        return AdminSettings::where(['admin_id' => $adminId])->firstOrFail();
+    }
+
+    public function getById(int $id): AdminSettings
+    {
+        return AdminSettings::firstOrFail($id);
     }
 }

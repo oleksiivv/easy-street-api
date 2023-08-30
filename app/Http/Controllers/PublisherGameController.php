@@ -72,10 +72,15 @@ class PublisherGameController extends Controller
 
         $game = $this->gameRepository->get($id);
 
+        $likes = $this->likesRepository->getMiddle($game->id);
+        $likesTotal = $this->likesRepository->getCountForGame($game->id);
+        $downloads = $this->downloadsRepository->getCountForGame($game->id);
+
         return new Response([
-            'downloads' => $this->downloadsRepository->getCountForGame($game->id),
-            'likes_total' => $this->likesRepository->getCountForGame($game->id),
-            'likes' => $this->likesRepository->getMiddle($game->id),
+            'downloads' => $downloads,
+            'likes' => $likes,
+            'likes_total' => $likesTotal,
+            'likes_percentage' => $downloads !== 0 ? round($likes / $downloads * 100) : ($likes>0?100:0),
             'subscriptions' => $this->userSubscriptionsRepository->getCount($game->publisher->id),
             'game' => $game->toArray(),
             'last_release' => $game->gameReleases?->last()?->toArray(),
