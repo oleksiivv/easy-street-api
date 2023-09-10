@@ -226,3 +226,10 @@ Route::group(['prefix' => '/payouts'], function () {
 Route::group(['prefix' => '/settings'], function () {
     Route::get('/{adminId}', [\App\Http\Controllers\Administration\AdministratorSettingsController::class, 'general']);
 });
+
+Route::group(['prefix' => '/ads'], function () {
+    Route::post('/{adminId}/subscribe/{email}', [\App\Http\Controllers\Ads\AdsSubscribersController::class, 'subscribe']);
+
+    Route::get('/subscribers', [\App\Http\Controllers\Ads\AdsSubscribersController::class, 'index'])->middleware('admin-access');
+});
+

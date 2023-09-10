@@ -2,20 +2,10 @@
 
 namespace App\Http\Controllers\Administration;
 
-use App\Http\Requests\Administration\CreateModeratorRequest;
-use App\Http\Requests\Administration\RemoveModeratorRequest;
-use App\Models\Role;
-use App\Models\User;
-use App\Repositories\AdministratorRepository;
 use App\Repositories\AdminSettingsRepository;
-use App\Repositories\RoleRepository;
-use App\Repositories\UserRepository;
 use App\Services\SettingsCacheService;
-use App\UseCases\CreateModeratorUseCase;
-use App\UseCases\RemoveModeratorUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Cache;
 
 class AdministratorSettingsController
 {

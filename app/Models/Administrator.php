@@ -11,7 +11,7 @@ class Administrator extends Model
 {
     use HasFactory;
 
-    protected $table = 'administrators_to_moderators_pivot';
+    protected $table = 'streets';
 
     protected $fillable = [
         'user_id',
