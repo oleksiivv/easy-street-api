@@ -43,6 +43,7 @@ class UpdateGameRequest extends FormRequest
             'status' => data_get($data, 'status'),
             'tags' => data_get($data, 'tags'),
             'site' => data_get($data, 'site'),
+            'is_game_release_enabled' => data_get($data, 'is_game_release_enabled'),
             'game_category_id' => data_get($data, 'game_category_id'),
             'paid_product_data' => $paidProduct,
             'game_page_data' => $gamePage,

@@ -35,4 +35,6 @@ class GameDTO extends DataTransferObject
     public ?GameLinksDTO $links;
 
     public bool $approved = false;
+
+    public bool $is_game_release_enabled = true;
 }

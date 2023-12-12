@@ -24,6 +24,7 @@ class CreateGameRequest extends FormRequest
             'status' => 'required|string',
             'tags' => 'required|array',
             'site' => 'nullable|string',
+            'is_game_release_enabled' => 'nullable|boolean',
             'game_category_id' => 'nullable|int',
             'company_id' => 'required|int',
 
@@ -74,6 +75,7 @@ class CreateGameRequest extends FormRequest
             'status' => data_get($data, 'status'),
             'tags' => data_get($data, 'tags'),
             'site' => data_get($data, 'site'),
+            'is_game_release_enabled' => data_get($data, 'is_game_release_enabled'),
             'game_category_id' => data_get($data, 'game_category_id'),
             'company_id' => data_get($data, 'company_id'),
             'paid_product_data' => $paidProduct,

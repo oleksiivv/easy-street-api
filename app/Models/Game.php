@@ -36,11 +36,13 @@ class Game extends Model
         'game_category_id',
         'company_id',
         'approved',
-        'es_index'
+        'es_index',
+        'is_game_release_enabled',
     ];
 
     protected $casts = [
         'tags' => 'json',
+        'is_game_release_enabled' => 'boolean',
     ];
 
     public const RELATIONS = ['gamePage', 'gameLinks', 'gameSecurity', 'gameReleases', 'paidProduct', 'gameCategory', 'publisher', 'customerGames'];
