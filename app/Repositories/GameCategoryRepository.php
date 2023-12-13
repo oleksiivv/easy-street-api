@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\DTO\GameCategoryDTO;
+use App\Models\Game;
 use App\Models\GameCategory;
 use Illuminate\Support\Collection;
 use Throwable;
@@ -31,10 +32,19 @@ class GameCategoryRepository
 
     public function all(): Collection
     {
-        return GameCategory::withCount('downloads')
+        $categories = GameCategory::withCount('downloads')
             ->orderBy('downloads_count', 'desc')
             ->get()
             ->load('games', 'games.gamePage');
+
+        return $categories->filter(function (GameCategory $category) {
+            $games = $category->games;
+            $activeGames = $games->filter(function ($game) {
+                return ! in_array($game->status, Game::STATUSES_BLOCKED);
+            });
+
+            return count($activeGames) > 0;
+        });
     }
 
     public function createIfNotExists(GameCategoryDTO $data): GameCategory

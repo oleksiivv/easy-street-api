@@ -25,6 +25,8 @@ class Game extends Model
 
     public const STATUSES_AVAILABLE_FOR_MODERATOR = ['draft', 'in_review', 'update_required', 'cancelled', 'update_in_review', 'will-be-removed'];
 
+    public const STATUSES_BLOCKED = ['will-be-removed'];
+
     protected $table = 'games';
 
     protected $fillable = [
