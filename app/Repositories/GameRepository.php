@@ -11,12 +11,12 @@ class GameRepository
 {
     public const GAME_GENRES_IMAGES = [
         'arcade' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
-        'adventure' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
-        'strategy' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
-        'quiz' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
-        'hyper-casual' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
-        'racing' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
-        'victory' => 'https://wallpaper-house.com/data/out/8/wallpaper2you_287091.png',
+        'adventure' => 'https://cdn.80.lv/api/upload/post/5173/images/5d2ce77e47b9e/widen_1220x0.jpg',
+        'strategy' => 'https://e1.pxfuel.com/desktop-wallpaper/788/257/desktop-wallpaper-1440x900-northgard-strategy-games-coast-treasure-box-sword-for-macbook-pro-15-inch-macbook-air-13-inch-northgard.jpg',
+        'quiz' => 'https://wallpapercave.com/wp/wp9440268.jpg',
+        'hyper-casual' => 'https://azurgames.com/wp-content/uploads/2022/09/1296h729.jpg',
+        'racing' => 'https://traxion.gg/wp-content/uploads/2022/03/Race-Condition-3.png',
+        'victory' => 'https://cdn.wallpapersafari.com/47/33/Wb06Ol.jpg',
         'other' => 'https://wallpapercave.com/wp/wp1868042.jpg',
     ];
 
